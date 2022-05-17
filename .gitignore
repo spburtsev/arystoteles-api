@@ -1,0 +1,5 @@
+.env
+.prettierrc
+.yarnclean
+public
+node_modules
