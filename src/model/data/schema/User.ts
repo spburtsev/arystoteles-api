@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { userRoles } from '../../enum/UserRole';
 
 const user = new Schema({
   _id: Schema.Types.ObjectId,
@@ -12,7 +13,7 @@ const user = new Schema({
     type: String,
     required: true,
   },
-  role: { type: String, required: true },
+  role: { type: String, required: true, enum: userRoles },
 });
 
 const User = model('User', user);

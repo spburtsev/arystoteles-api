@@ -3,3 +3,4 @@
 .yarnclean
 public
 node_modules
+*.log
