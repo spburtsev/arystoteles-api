@@ -44,7 +44,7 @@ class EmailService {
 
   async send(template: string, subject: string) {
     const html = pug.renderFile(
-      `${__dirname}/../static/email/${template}.pug`,
+      `${__dirname}/../../static/email/${template}.pug`,
       {
         firstName: this.firstName,
         url: this.url,

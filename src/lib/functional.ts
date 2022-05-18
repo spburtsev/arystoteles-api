@@ -21,3 +21,25 @@ export const hash = (value: string) => {
     .update(value)
     .digest('hex');
 };
+
+export const filterObj = <T extends object>(
+  obj: T,
+  ...allowedFields: Array<string>
+) => {
+  let newObj: T;
+  Object.keys(obj).forEach(el => {
+    if (allowedFields.includes(el)) {
+      newObj[el] = obj[el];
+    }
+  });
+  return newObj;
+};
+
+export const splitAndJoin = (value: string) => value.split(',').join(' ');
+
+export const parseExtension = (value: unknown) => {
+  if (typeof value === 'string') {
+    return splitAndJoin(value);
+  }
+  return '';
+};

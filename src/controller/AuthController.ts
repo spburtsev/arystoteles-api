@@ -5,7 +5,7 @@ import UserData from 'src/model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
 import { catchAsync, hash } from '../lib/functional';
 import UserRole from 'src/model/enum/UserRole';
-import EmailService from 'src/service/EmailService';
+import EmailService from 'src/controller/service/EmailService';
 
 const signToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
