@@ -1,8 +1,7 @@
 import { catchAsync } from '../../lib/functional';
-import AppError from '../../model/domain/AppError';
+import AppError from '../../model/error/AppError';
 import { Model } from 'mongoose';
 import ExtensionService from '../../controller/service/ExtensionService';
-import { Mode } from 'fs';
 
 namespace CrudFactory {
   export const deleteOne = (model: Model<any>) =>
