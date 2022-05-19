@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import DataContext from './model/data/DataContext';
-import app from './app';
+import App from './App';
 
 process.on('uncaughtException', (err: Error) => {
   console.log('UNCAUGHT EXCEPTION! Shutting down...');
@@ -17,6 +17,7 @@ const ctx = new DataContext();
 ctx.createSeedUserIfNotExists();
 
 const port = process.env.APP_PORT || 3000;
+const app = App.create();
 const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
