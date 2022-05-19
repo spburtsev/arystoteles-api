@@ -61,7 +61,6 @@ UserSchema.pre<IUser>('save', function(next) {
 });
 
 UserSchema.pre<Query<Array<IUser>, IUser>>(/^find/, function(next) {
-  // this points to the current query
   this.find({ active: { $ne: false } });
   next();
 });
@@ -69,7 +68,9 @@ UserSchema.pre<Query<Array<IUser>, IUser>>(/^find/, function(next) {
 UserSchema.methods.comparePasswords = async (
   candidatePassword: string,
   userPassword: string,
-) => await bcrypt.compare(candidatePassword, userPassword);
+) => {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 UserSchema.methods.changedPasswordAfter = function(JwtTimestamp: number) {
   const changedAt = this.passwordChangedAt as Date;

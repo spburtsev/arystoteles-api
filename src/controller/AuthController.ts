@@ -1,3 +1,4 @@
+import jwtSync from 'jsonwebtoken';
 import jwt from 'jwt-promisify';
 import crypto from 'crypto';
 import User from '../model/domain/User';
@@ -8,23 +9,23 @@ import { catchAsync } from '../lib/functional';
 import UserRole from '../model/enum/UserRole';
 import EmailService from '../controller/service/EmailService';
 
-const signToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = (id: string, role: UserRole) => {
+  return jwtSync.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: parseInt(process.env.JWT_EXPIRES_IN),
   });
 };
 
-const createToken = (
+const createToken = async (
   user: User,
   statusCode: number,
   req: Request,
   res: Response,
 ) => {
-  const token = signToken(user.id);
+  const token = signToken(user.id, user.role);
   const expires = new Date(
-    Date.now() +
-      parseInt(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000,
+    Date.now() + parseInt(process.env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000,
   );
+
   res.cookie('jwt', token, {
     expires,
     httpOnly: true,
@@ -62,6 +63,7 @@ namespace AuthController {
       return next(new AppError('Email or password not specified', 400));
     }
     const userDoc = await UserModel.findOne({ email }).select('+password');
+
     if (
       !userDoc ||
       !(await userDoc.comparePasswords(password, userDoc.password))

@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import ExtensionService from '../../controller/service/ExtensionService';
 
 namespace CrudFactory {
-  export const deleteOne = (model: Model<any>) =>
+  export const deleteOne = <T>(model: Model<T>) =>
     catchAsync(async (req, res, next) => {
       const doc = await model.findByIdAndDelete(req.params.id);
 
@@ -18,7 +18,7 @@ namespace CrudFactory {
       });
     });
 
-  export const updateOne = (model: Model<any>) =>
+  export const updateOne = <T>(model: Model<T>) =>
     catchAsync(async (req, res, next) => {
       const doc = await model.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -37,7 +37,7 @@ namespace CrudFactory {
       });
     });
 
-  export const createOne = (model: Model<any>) =>
+  export const createOne = <T>(model: Model<T>) =>
     catchAsync(async (req, res, _next) => {
       const doc = await model.create(req.body);
 
@@ -49,9 +49,9 @@ namespace CrudFactory {
       });
     });
 
-  export const getOne = (model: Model<any>, popOptions?: string | string[]) =>
+  export const getOne = <T>(model: Model<T>, popOptions?: string | string[]) =>
     catchAsync(async (req, res, next) => {
-      let query = model.findById(req.params.id);
+      let query: any = model.findById(req.params.id);
       if (popOptions) {
         query = query.populate(popOptions);
       }
@@ -69,7 +69,7 @@ namespace CrudFactory {
       });
     });
 
-  export const getAll = (model: Model<any>) =>
+  export const getAll = <T>(model: Model<T>) =>
     catchAsync(async (req, res, _next) => {
       let filter = {};
       if (req.params.id) {
