@@ -25,7 +25,7 @@ const upload = multer({
 namespace UserController {
   export const uploadUserPhoto = upload.single('photo');
 
-  export const resizeUserPhoto = catchAsync(async (req, res, next) => {
+  export const resizeUserPhoto = catchAsync(async (req, _res, next) => {
     if (!req.file) {
       return next();
     }

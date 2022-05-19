@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import crypto from 'crypto';
 
 export type AnyFn = (...args: any[]) => any;
 export type ExpressFn = (
@@ -13,13 +12,6 @@ export const catchAsync = (fn: ExpressFn) => {
   return (req: Request, res: Response, next: NextFunction) => {
     fn(req, res, next).catch(next);
   };
-};
-
-export const hash = (value: string) => {
-  return crypto
-    .createHash('sha256')
-    .update(value)
-    .digest('hex');
 };
 
 export const filterObj = <T extends object>(

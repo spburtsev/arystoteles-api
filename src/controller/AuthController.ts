@@ -1,15 +1,16 @@
 import jwt from 'jwt-promisify';
+import crypto from 'crypto';
 import User from '../model/domain/User';
 import AppError from '../model/error/AppError';
-import UserData from '../model/data/schema/User';
+import UserModel from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
-import { catchAsync, hash } from '../lib/functional';
+import { catchAsync } from '../lib/functional';
 import UserRole from '../model/enum/UserRole';
 import EmailService from '../controller/service/EmailService';
 
 const signToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: parseInt(process.env.JWT_EXPIRES_IN),
   });
 };
 
@@ -20,11 +21,12 @@ const createToken = (
   res: Response,
 ) => {
   const token = signToken(user.id);
+  const expires = new Date(
+    Date.now() +
+      parseInt(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000,
+  );
   res.cookie('jwt', token, {
-    expires: new Date(
-      Date.now() +
-        Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000,
-    ),
+    expires,
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
@@ -34,6 +36,7 @@ const createToken = (
   res.status(statusCode).json({
     status: 'success',
     token,
+    expires,
     data: {
       user: transformedUser,
     },
@@ -42,29 +45,30 @@ const createToken = (
 
 namespace AuthController {
   export const register = catchAsync(async (req, res, _next) => {
-    const newUser = await UserData.create({
-      name: req.body.name,
+    const userDoc = await UserModel.create({
       email: req.body.email,
       password: req.body.password,
+      role: req.body.role,
     });
 
     const url = `${req.protocol}://${req.get('host')}/me`;
-    await new EmailService(newUser, url).sendWelcome();
-    createToken(newUser, 201, req, res);
+    await new EmailService(userDoc.email, url).sendWelcome();
+    createToken(User.from(userDoc), 201, req, res);
   });
 
   export const login = catchAsync(async (req, res, next) => {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return next(new AppError('Email or password not specified', 400));
     }
-    const user = await UserData.findOne({ email }).select('+password');
-
-    if (!user || !(await user.correctPassword(password, user.password))) {
+    const userDoc = await UserModel.findOne({ email }).select('+password');
+    if (
+      !userDoc ||
+      !(await userDoc.comparePasswords(password, userDoc.password))
+    ) {
       return next(new AppError('Incorrect email or password', 401));
     }
-
+    const user = User.from(userDoc);
     createToken(user, 200, req, res);
   });
 
@@ -92,7 +96,7 @@ namespace AuthController {
     }
 
     const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-    const currentUser = await UserData.findById(decoded.id);
+    const currentUser = await UserModel.findById(decoded.id);
     if (!currentUser) {
       return next(
         new AppError(
@@ -128,7 +132,7 @@ namespace AuthController {
           process.env.JWT_SECRET,
         );
 
-        const currentUser = await UserData.findById(decoded.id);
+        const currentUser = await UserModel.findById(decoded.id);
         if (!currentUser) {
           return next();
         }
@@ -162,28 +166,28 @@ namespace AuthController {
 
   export const forgotPassword = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-      const user = await UserData.findOne({ email: req.body.email });
-      if (!user) {
+      const userDoc = await UserModel.findOne({ email: req.body.email });
+      if (!userDoc) {
         return next(new AppError('There is no user with email address.', 404));
       }
-      const resetToken = user.createPasswordResetToken();
-      await user.save({ validateBeforeSave: false });
+      const resetToken = userDoc.createPasswordResetToken();
+      await userDoc.save({ validateBeforeSave: false });
 
       try {
         const resetURL = `${req.protocol}://${req.get(
           'host',
         )}/api/v1/users/resetPassword/${resetToken}`;
 
-        await new EmailService(user, resetURL).sendPasswordReset();
+        await new EmailService(userDoc.email, resetURL).sendPasswordReset();
 
         res.status(200).json({
           status: 'success',
           message: 'Token sent to email!',
         });
       } catch (err) {
-        user.passwordResetToken = undefined;
-        user.passwordResetExpires = undefined;
-        await user.save({ validateBeforeSave: false });
+        userDoc.passwordResetToken = undefined;
+        userDoc.passwordResetExpires = undefined;
+        await userDoc.save({ validateBeforeSave: false });
 
         return next(
           new AppError(
@@ -196,9 +200,12 @@ namespace AuthController {
   );
 
   export const resetPassword = catchAsync(async (req, res, next) => {
-    const hashedToken = hash(req.params.token);
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
 
-    const user = await UserData.findOne({
+    const user = await UserModel.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
     });
@@ -207,27 +214,25 @@ namespace AuthController {
       return next(new AppError('Token is invalid or has expired', 400));
     }
     user.password = req.body.password;
-    user.passwordConfirm = req.body.passwordConfirm;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();
 
-    createToken(user, 200, req, res);
+    createToken(User.from(user), 200, req, res);
   });
 
   export const updatePassword = catchAsync(async (req, res, next) => {
-    const user = await UserData.findById(req.user.id).select('+password');
+    const user = await UserModel.findById(req.user.id).select('+password');
 
     if (
-      !(await user.correctPassword(req.body.passwordCurrent, user.password))
+      !(await user.comparePasswords(req.body.passwordCurrent, user.password))
     ) {
       return next(new AppError('Your current password is wrong.', 401));
     }
     user.password = req.body.password;
-    user.passwordConfirm = req.body.passwordConfirm;
     await user.save();
 
-    createToken(user, 200, req, res);
+    createToken(User.from(user), 200, req, res);
   });
 }
 export default AuthController;

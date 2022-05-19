@@ -1,7 +1,7 @@
-import { hash } from '../../lib/functional';
 import Database from './Database';
 import User from './schema/User';
 import UserRole from '../enum/UserRole';
+import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 
 class DataContext {
@@ -16,10 +16,9 @@ class DataContext {
   }
 
   private createSeedUser() {
-    const hashedPassword = hash(process.env.SEED_PSW || 'seed');
+    const hashedPassword = bcrypt.hashSync(process.env.SEED_PSW, 12);
 
     const seed = new User({
-      _id: new mongoose.Types.ObjectId(),
       email: process.env.SEED_USR || 'admin@arystoteles.org',
       password: hashedPassword,
       role: UserRole.Seed,

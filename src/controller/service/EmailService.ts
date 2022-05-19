@@ -8,15 +8,8 @@ class EmailService {
   from: string;
   url: string;
 
-  constructor(
-    user: {
-      name: string;
-      email: string;
-    },
-    url: string,
-  ) {
-    this.to = user.email;
-    this.firstName = user.name.split(' ')[0];
+  constructor(email: string, url: string) {
+    this.to = email;
     this.url = url;
     this.from = `Arystoteles <${process.env.EMAIL_FROM}>`;
   }
