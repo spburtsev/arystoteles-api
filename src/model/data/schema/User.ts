@@ -6,6 +6,7 @@ import crypto from 'crypto';
 
 import Organization from './Organization';
 import Parent from './Parent';
+import Medic from './Medic';
 
 export interface IUser extends Document {
   email: string;
@@ -81,6 +82,13 @@ UserSchema.post<IUser>('save', async function(doc, next) {
     });
     return next();
   }
+  if (doc.role === UserRole.Medic) {
+    await Medic.create({
+      user: doc._id,
+    });
+    return next();
+  }
+
   next();
 });
 

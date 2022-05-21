@@ -1,5 +1,6 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
+import { IChild } from './Child';
 
 export interface IParent extends Document {
   firstName: string;
@@ -7,8 +8,10 @@ export interface IParent extends Document {
   country: string;
   city: string;
 
+  children: Array<IChild>;
   user: IUser;
 }
+
 const ParentSchema = new Schema({
   firstName: {
     type: String,
@@ -21,6 +24,7 @@ const ParentSchema = new Schema({
     default: '?',
   },
 
+  children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',

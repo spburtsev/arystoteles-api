@@ -1,5 +1,6 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
+import { IMedic } from './Medic';
 
 export interface IOrganization extends Document {
   name: string;
@@ -12,33 +13,34 @@ export interface IOrganization extends Document {
   image: string;
 
   administrator: IUser;
+  medics: Array<IMedic>;
 }
 
 const OrganizationSchema = new Schema<IOrganization>({
   name: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   country: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   city: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   address: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   phone: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   image: {
     type: String,
@@ -49,6 +51,7 @@ const OrganizationSchema = new Schema<IOrganization>({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  medics: [{ type: Schema.Types.ObjectId, ref: 'Medic' }],
 });
 
 const Organization: Model<IOrganization> = model(
