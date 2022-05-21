@@ -37,7 +37,7 @@ const sendErrorDev = (err: AppError, res: Response) => {
   });
 };
 
-const sendErrorProd = (err, res) => {
+const sendErrorProd = (err: AppError, res: Response) => {
   if (err.isOperational) {
     res.status(err.statusCode).json({
       status: err.status,
@@ -55,9 +55,9 @@ const sendErrorProd = (err, res) => {
 
 const errorMiddleware = (
   err: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';

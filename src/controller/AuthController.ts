@@ -1,22 +1,21 @@
 import jwtSync from 'jsonwebtoken';
 import jwt from 'jwt-promisify';
 import crypto from 'crypto';
-import User from '../model/domain/User';
 import AppError from '../model/error/AppError';
-import UserModel from '../model/data/schema/User';
+import User, { IUser } from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
 import { catchAsync } from '../lib/functional';
-import UserRole from '../model/enum/UserRole';
+import UserRole, { securedRoles } from '../model/enum/UserRole';
 import EmailService from '../controller/service/EmailService';
 
 const signToken = (id: string, role: UserRole) => {
   return jwtSync.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: parseInt(process.env.JWT_EXPIRES_IN),
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
 const createToken = async (
-  user: User,
+  user: IUser,
   statusCode: number,
   req: Request,
   res: Response,
@@ -32,29 +31,34 @@ const createToken = async (
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
-  const transformedUser = user.withoutPassword();
+  const secured = user.secured();
 
   res.status(statusCode).json({
     status: 'success',
     token,
     expires,
     data: {
-      user: transformedUser,
+      user: secured,
     },
   });
 };
 
 namespace AuthController {
-  export const register = catchAsync(async (req, res, _next) => {
-    const userDoc = await UserModel.create({
-      email: req.body.email,
-      password: req.body.password,
-      role: req.body.role,
+  export const register = catchAsync(async (req, res, next) => {
+    const { email, password, role } = req.body;
+    if (securedRoles.includes(role)) {
+      return next(
+        new AppError(`It is not allowed to register as ${role}`, 400),
+      );
+    }
+    const user = await User.create({
+      email,
+      password,
+      role,
     });
-
-    const url = `${req.protocol}://${req.get('host')}/me`;
-    await new EmailService(userDoc.email, url).sendWelcome();
-    createToken(User.from(userDoc), 201, req, res);
+    // const url = `${req.protocol}://${req.get('host')}/me`;
+    // await new EmailService(user.email, url).sendWelcome();
+    createToken(user, 201, req, res);
   });
 
   export const login = catchAsync(async (req, res, next) => {
@@ -62,15 +66,11 @@ namespace AuthController {
     if (!email || !password) {
       return next(new AppError('Email or password not specified', 400));
     }
-    const userDoc = await UserModel.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password');
 
-    if (
-      !userDoc ||
-      !(await userDoc.comparePasswords(password, userDoc.password))
-    ) {
+    if (!user || !(await user.comparePasswords(password, user.password))) {
       return next(new AppError('Incorrect email or password', 401));
     }
-    const user = User.from(userDoc);
     createToken(user, 200, req, res);
   });
 
@@ -98,25 +98,16 @@ namespace AuthController {
     }
 
     const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-    const currentUser = await UserModel.findById(decoded.id);
+    const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
-      return next(
-        new AppError(
-          'The user belonging to this token does no longer exist.',
-          401,
-        ),
-      );
+      return next(new AppError('The user no longer exists.', 401));
     }
 
     if (currentUser.changedPasswordAfter(decoded.iat)) {
       return next(
-        new AppError(
-          'User recently changed password! Please log in again.',
-          401,
-        ),
+        new AppError('Password changed recently Please log in again.', 401),
       );
     }
-
     req.user = currentUser;
     res.locals.user = currentUser;
     next();
@@ -134,7 +125,7 @@ namespace AuthController {
           process.env.JWT_SECRET,
         );
 
-        const currentUser = await UserModel.findById(decoded.id);
+        const currentUser = await User.findById(decoded.id);
         if (!currentUser) {
           return next();
         }
@@ -155,12 +146,7 @@ namespace AuthController {
   export const restrictTo = (...roles: Array<UserRole>) => {
     return (req: Request, _res: Response, next: NextFunction) => {
       if (!roles.includes(req.user.role)) {
-        return next(
-          new AppError(
-            'You do not have permission to perform this action',
-            403,
-          ),
-        );
+        return next(new AppError('Forbidden', 403));
       }
       next();
     };
@@ -168,35 +154,30 @@ namespace AuthController {
 
   export const forgotPassword = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-      const userDoc = await UserModel.findOne({ email: req.body.email });
-      if (!userDoc) {
-        return next(new AppError('There is no user with email address.', 404));
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return next(new AppError('User not found.', 404));
       }
-      const resetToken = userDoc.createPasswordResetToken();
-      await userDoc.save({ validateBeforeSave: false });
+      const resetToken = user.createPasswordResetToken();
+      await user.save({ validateBeforeSave: false });
 
       try {
         const resetURL = `${req.protocol}://${req.get(
           'host',
         )}/api/v1/users/resetPassword/${resetToken}`;
 
-        await new EmailService(userDoc.email, resetURL).sendPasswordReset();
+        await new EmailService(user.email, resetURL).sendPasswordReset();
 
         res.status(200).json({
           status: 'success',
           message: 'Token sent to email!',
         });
       } catch (err) {
-        userDoc.passwordResetToken = undefined;
-        userDoc.passwordResetExpires = undefined;
-        await userDoc.save({ validateBeforeSave: false });
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
 
-        return next(
-          new AppError(
-            'There was an error sending the email. Try again later!',
-            500,
-          ),
-        );
+        return next(new AppError('Error sending the email.', 500));
       }
     },
   );
@@ -207,24 +188,24 @@ namespace AuthController {
       .update(req.params.token)
       .digest('hex');
 
-    const user = await UserModel.findOne({
+    const user = await User.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
     });
 
     if (!user) {
-      return next(new AppError('Token is invalid or has expired', 400));
+      return next(new AppError('Invalid or expired token', 400));
     }
     user.password = req.body.password;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save();
 
-    createToken(User.from(user), 200, req, res);
+    createToken(user, 200, req, res);
   });
 
   export const updatePassword = catchAsync(async (req, res, next) => {
-    const user = await UserModel.findById(req.user.id).select('+password');
+    const user = await User.findById(req.user.id).select('+password');
 
     if (
       !(await user.comparePasswords(req.body.passwordCurrent, user.password))
@@ -233,8 +214,7 @@ namespace AuthController {
     }
     user.password = req.body.password;
     await user.save();
-
-    createToken(User.from(user), 200, req, res);
+    createToken(user, 200, req, res);
   });
 }
 export default AuthController;

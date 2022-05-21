@@ -4,6 +4,9 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
+import Organization from './Organization';
+import Parent from './Parent';
+
 export interface IUser extends Document {
   email: string;
   password: string;
@@ -22,6 +25,11 @@ export interface IUser extends Document {
   changedPasswordAfter: (JwtTimestamp: Number) => boolean;
 
   createPasswordResetToken: () => string;
+
+  secured(): Omit<
+    IUser,
+    'password' | 'passwordResetToken' | 'passwordResetExpires'
+  >;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -60,15 +68,31 @@ UserSchema.pre<IUser>('save', function(next) {
   next();
 });
 
+UserSchema.post<IUser>('save', async function(doc, next) {
+  if (doc.role === UserRole.OrganizationAdministrator) {
+    await Organization.create({
+      administrator: doc._id,
+    });
+    return next();
+  }
+  if (doc.role === UserRole.Parent) {
+    await Parent.create({
+      user: doc._id,
+    });
+    return next();
+  }
+  next();
+});
+
 UserSchema.pre<Query<Array<IUser>, IUser>>(/^find/, function(next) {
   this.find({ active: { $ne: false } });
   next();
 });
 
-UserSchema.methods.comparePasswords = async (
+UserSchema.methods.comparePasswords = async function(
   candidatePassword: string,
   userPassword: string,
-) => {
+) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
@@ -89,6 +113,16 @@ UserSchema.methods.createPasswordResetToken = function() {
     .digest('hex');
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
+};
+
+UserSchema.methods.secured = function() {
+  const {
+    password,
+    passwordResetToken,
+    passwordResetExpires,
+    ...user
+  } = this.toObject();
+  return user;
 };
 
 const User: Model<IUser> = model('User', UserSchema);
