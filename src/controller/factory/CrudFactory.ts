@@ -73,7 +73,7 @@ namespace CrudFactory {
     catchAsync(async (req, res, _next) => {
       let filter = {};
       if (req.params.id) {
-        filter = { tour: req.params.id };
+        filter = { item: req.params.id };
       }
 
       const ext = new ExtensionService(model.find(filter), req.query)
