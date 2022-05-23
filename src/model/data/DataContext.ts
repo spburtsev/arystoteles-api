@@ -9,7 +9,6 @@ class DataContext {
 
   private async seedUserExists() {
     const user = await User.findOne({ type: UserRole.Seed }).exec();
-
     return user !== null;
   }
 
