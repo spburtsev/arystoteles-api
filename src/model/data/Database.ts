@@ -1,4 +1,5 @@
 import mongoose, { type Connection } from 'mongoose';
+import dbConnectionString from 'src/lib/helpers/db-connection-string';
 
 class Database {
   private static instance: Database;
@@ -10,8 +11,7 @@ class Database {
 
   public static connect() {
     if (!Database.instance) {
-      const db = process.env.DB.replace('<password>', encodeURIComponent(process.env.DB_PSW));
-      mongoose.connect(db).then(conn => {
+      mongoose.connect(dbConnectionString).then(conn => {
         console.log(
           'Database connection established, using:\n',
           conn.connection.name,

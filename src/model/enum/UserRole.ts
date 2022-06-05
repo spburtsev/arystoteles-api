@@ -3,7 +3,7 @@ enum UserRole {
   Admin = 'admin',
   OrganizationAdministrator = 'organizationAdministrator',
   Medic = 'medic',
-  Parent = 'parent',
+  Caregiver = 'caregiver',
 }
 export default UserRole;
 
@@ -11,7 +11,7 @@ export const userRoles = [
   UserRole.Seed,
   UserRole.Admin,
   UserRole.OrganizationAdministrator,
-  UserRole.Parent,
+  UserRole.Caregiver,
   UserRole.Medic,
 ];
 

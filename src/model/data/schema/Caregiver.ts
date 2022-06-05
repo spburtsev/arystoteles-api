@@ -1,18 +1,18 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
-import { IChild } from './Child';
+import { IChildRelation } from './ChildRelation';
 
-export interface IParent extends Document {
+export interface ICaregiver extends Document {
   firstName: string;
   lastName: string;
   country: string;
   city: string;
 
-  children: Array<IChild>;
+  childRelations: Array<IChildRelation>;
   user: IUser;
 }
 
-const ParentSchema = new Schema({
+const CaregiverSchema = new Schema({
   firstName: {
     type: String,
     required: false,
@@ -24,12 +24,12 @@ const ParentSchema = new Schema({
     default: '?',
   },
 
-  children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+  childRelations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
 });
 
-const Parent: Model<IParent> = model('Parent', ParentSchema);
-export default Parent;
+const Caregiver: Model<ICaregiver> = model('Caregiver', CaregiverSchema);
+export default Caregiver;

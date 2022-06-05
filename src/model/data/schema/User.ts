@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 
 import Organization from './Organization';
-import Parent from './Parent';
+import Caregiver from './Caregiver';
 import Medic from './Medic';
 
 export interface IUser extends Document {
@@ -76,8 +76,8 @@ UserSchema.post<IUser>('save', async function(doc, next) {
     });
     return next();
   }
-  if (doc.role === UserRole.Parent) {
-    await Parent.create({
+  if (doc.role === UserRole.Caregiver) {
+    await Caregiver.create({
       user: doc._id,
     });
     return next();
@@ -123,7 +123,7 @@ UserSchema.methods.createPasswordResetToken = function() {
   return resetToken;
 };
 
-UserSchema.methods.secured = function() {
+UserSchema.methods.secured = function(this: IUser) {
   const {
     password,
     passwordResetToken,
