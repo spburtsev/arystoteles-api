@@ -12,6 +12,7 @@ export interface IChild extends Document {
   birthWeightSecondary: number;
   currentWeightPrimary: number;
   currentWeightSecondary: number;
+  active: boolean;
 
   relations: Array<IChildRelation>;
   journalPosts: Array<IJournalPost>;
@@ -34,6 +35,11 @@ const ChildSchema = new Schema({
   birthWeightSecondary: {
     type: Number,
     required: true,
+  },
+  active: {
+    type: Boolean,
+    required: false,
+    default: true,
   },
 
   currentWeightPrimary: {
