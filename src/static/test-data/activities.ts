@@ -1,8 +1,7 @@
-import { IActivity } from '../src/model/data/schema/Activity';
-import AgeGroup from '../src/model/enum/AgeGroup';
-import ActivityCategory from '../src/model/enum/ActivityCategory';
-import ActivityFrequency from '../src/model/enum/ActivityFrequency';
-import AppLocale from '../src/model/enum/AppLocale';
+import AgeGroup from '../../model/enum/AgeGroup';
+import ActivityCategory from '../../model/enum/ActivityCategory';
+import ActivityFrequency from '../../model/enum/ActivityFrequency';
+import AppLocale from '../../model/enum/AppLocale';
 
 const activities = [
   {
@@ -50,3 +49,4 @@ const activities = [
     },
   },
 ];
+export default activities;

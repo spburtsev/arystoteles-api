@@ -6,6 +6,7 @@ export interface IMedic extends Document {
   firstName: string;
   lastName: string;
   title: string;
+  isConfirmed: boolean;
 
   user: IUser;
   organization: IOrganization;
@@ -26,6 +27,11 @@ const MedicSchema = new Schema({
     type: String,
     required: false,
     default: '',
+  },
+  isConfirmed: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 
   user: {
