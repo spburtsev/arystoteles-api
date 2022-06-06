@@ -1,6 +1,7 @@
 import UserData from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
-import { AnyFn, filterObj } from '../lib/functional';
+import { AnyFn } from '../lib/functional';
+import _ from 'lodash';
 import multer from 'multer';
 import sharp from 'sharp';
 import AppError from '../model/error/AppError';
@@ -56,7 +57,11 @@ namespace UserController {
       );
     }
 
-    const filteredBody = filterObj(req.body, 'name', 'email');
+    const filteredBody: {
+      name?: string;
+      email?: string;
+      photo?: string;
+    } = _.pick(req.body, 'name', 'email');
     if (req.file) {
       filteredBody.photo = req.file.filename;
     }

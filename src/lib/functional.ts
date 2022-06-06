@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import _ from 'lodash';
 
 export type AnyFn = (...args: any[]) => any;
 export type ExpressFn = (
@@ -14,11 +13,6 @@ export const catchAsync = (fn: ExpressFn) => {
     fn(req, res, next).catch(next);
   };
 };
-
-export const filterObj = <T extends object>(
-  obj: T,
-  ...allowedFields: Array<string>
-) => _.pick(obj, allowedFields);
 
 export const splitAndJoin = (value: string) => value.split(',').join(' ');
 
