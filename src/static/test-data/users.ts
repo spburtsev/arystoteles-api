@@ -1,4 +1,4 @@
-import UserRole from 'src/model/enum/UserRole';
+import UserRole from '../../model/enum/UserRole';
 
 const users = [
   {

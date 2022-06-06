@@ -1,7 +1,7 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IChild } from './Child';
 import { ICaregiver } from './Caregiver';
-import ChildFeeling from 'src/model/enum/ChildFeeling';
+import ChildFeeling from '../../../model/enum/ChildFeeling';
 
 export interface IJournalPost extends Document {
   text: string;

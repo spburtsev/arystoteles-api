@@ -1,5 +1,5 @@
 import express from 'express';
-import BackupController from 'src/controller/BackupController';
+import BackupController from '../controller/BackupController';
 import AuthController from '../controller/AuthController';
 import UserRole from '../model/enum/UserRole';
 

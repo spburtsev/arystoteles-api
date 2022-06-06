@@ -1,20 +1,23 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import AgeGroup from 'src/model/enum/AgeGroup';
-import TipCategory from 'src/model/enum/TipCategory';
-import LocalizedContent, {
-  LocalizedStringSchemaType,
-} from '../LocalizedContent';
+import AgeGroup from '../../../model/enum/AgeGroup';
+import TipCategory from '../../../model/enum/TipCategory';
+import LocalizedString from '../LocalizedString';
 
 export interface ITip extends Document {
   category: TipCategory;
   ageGroups: Array<AgeGroup>;
-  text: LocalizedContent<string>;
+  text: LocalizedString;
 }
 
 const TipSchema = new Schema({
-  category: { type: TipCategory, required: false, default: TipCategory.Other },
-  ageGroups: [{ type: AgeGroup, required: true }],
-  text: { type: LocalizedStringSchemaType, required: true },
+  category: {
+    type: String,
+    required: false,
+    default: TipCategory.Other,
+    enum: Object.values(TipCategory),
+  },
+  ageGroups: [{ type: Number, required: true, enum: Object.values(AgeGroup) }],
+  text: { type: Schema.Types._LocalizedString, required: true },
 });
 
 const Tip: Model<ITip> = model('Tip', TipSchema);

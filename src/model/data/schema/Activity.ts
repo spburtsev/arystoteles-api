@@ -1,11 +1,9 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import ActivityCategory from 'src/model/enum/ActivityCategory';
-import ActivityFrequency from 'src/model/enum/ActivityFrequency';
-import AgeGroup from 'src/model/enum/AgeGroup';
-import {
-  LocalizedString,
-  LocalizedStringSchemaType,
-} from '../LocalizedContent';
+import ActivityCategory from '../../../model/enum/ActivityCategory';
+import ActivityFrequency from '../../../model/enum/ActivityFrequency';
+import AgeGroup from '../../../model/enum/AgeGroup';
+import LocalizedString from '../LocalizedString';
+import _LocalizedString from './types/_LocalizedString';
 
 export interface IActivity extends Document {
   category: ActivityCategory;
@@ -17,12 +15,20 @@ export interface IActivity extends Document {
 }
 
 const ActivitySchema = new Schema({
-  category: { type: ActivityCategory, required: true },
-  ageGroups: [{ type: AgeGroup, required: true }],
+  category: {
+    type: String,
+    required: true,
+    enum: Object.values(ActivityCategory),
+  },
+  ageGroups: [{ type: String, required: true, enum: Object.values(AgeGroup) }],
   duration: { type: Number, required: true },
-  frequency: { type: ActivityFrequency, required: true },
-  title: { type: LocalizedStringSchemaType, required: true },
-  description: { type: LocalizedStringSchemaType, required: true },
+  frequency: {
+    type: String,
+    required: true,
+    enum: Object.values(ActivityFrequency),
+  },
+  title: { type: _LocalizedString, required: true },
+  description: { type: _LocalizedString, required: true },
 });
 
 const Activity: Model<IActivity> = model('Activity', ActivitySchema);

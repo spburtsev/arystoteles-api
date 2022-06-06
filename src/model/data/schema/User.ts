@@ -1,5 +1,5 @@
 import { Model, Schema, Document, Query, model } from 'mongoose';
-import UserRole, { userRoles } from '../../enum/UserRole';
+import UserRole from '../../enum/UserRole';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
@@ -50,7 +50,7 @@ const UserSchema = new Schema<IUser>({
   passwordChangedAt: { type: Date },
   passwordResetToken: { type: String },
   passwordResetExpires: { type: Date },
-  role: { type: String, required: true, enum: userRoles },
+  role: { type: String, required: true, enum: Object.values(UserRole) },
   isActive: { type: Boolean, default: true, select: false },
 });
 

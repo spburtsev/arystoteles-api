@@ -16,12 +16,12 @@ const CaregiverSchema = new Schema({
   firstName: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
   lastName: {
     type: String,
     required: false,
-    default: '?',
+    default: '',
   },
 
   childRelations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],

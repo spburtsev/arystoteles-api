@@ -1,8 +1,8 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IChildRelation } from './ChildRelation';
 import { IJournalPost } from './JournalPost';
-import { monthsPassed } from 'src/lib/helpers/month-difference';
-import { matchAgeGroup } from 'src/model/enum/AgeGroup';
+import { monthsPassed } from '../../../lib/helpers/month-difference';
+import { matchAgeGroup } from '../../../model/enum/AgeGroup';
 
 export interface IChild extends Document {
   firstName: string;

@@ -1,5 +1,5 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import ChildRelationType from 'src/model/enum/ChildRelationType';
+import ChildRelationType from '../../../model/enum/ChildRelationType';
 import { IChild } from './Child';
 import { IUser } from './User';
 
