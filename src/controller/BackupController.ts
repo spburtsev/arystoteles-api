@@ -39,9 +39,9 @@ namespace BackupController {
   });
 
   export const createBackup = (
-    req: Request,
+    _req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ) => {
     const dumpProcess = dumpBackup();
     dumpProcess.on('error', error => {
@@ -70,7 +70,7 @@ namespace BackupController {
   export const restoreFromBackup = (
     req: Request,
     res: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ) => {
     const restoreProcess = restore(req.params.fileName);
     restoreProcess.on('error', error => {
