@@ -1,11 +1,10 @@
-import UserData from '../model/data/schema/User';
+import User from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
-import { AnyFn } from '../lib/functional';
 import _ from 'lodash';
 import multer from 'multer';
 import sharp from 'sharp';
 import AppError from '../model/error/AppError';
-import { catchAsync } from '../lib/functional';
+import catchAsync, { AnyFn } from '../lib/helpers/catch-async';
 import CrudFactory from './factory/CrudFactory';
 
 const storage = multer.memoryStorage();
@@ -66,7 +65,7 @@ namespace UserController {
       filteredBody.photo = req.file.filename;
     }
 
-    const updatedUser = await UserData.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.user.id!,
       filteredBody,
       {
@@ -84,7 +83,7 @@ namespace UserController {
   });
 
   export const deleteSelf = catchAsync(async (req, res, _next) => {
-    await UserData.findByIdAndUpdate(req.user.id, { active: false });
+    await User.findByIdAndUpdate(req.user.id, { active: false });
 
     res.status(204).json({
       status: 'success',
@@ -92,10 +91,10 @@ namespace UserController {
     });
   });
 
-  export const getUser = CrudFactory.getOne(UserData);
-  export const getAllUsers = CrudFactory.getAll(UserData);
-  export const updateUser = CrudFactory.updateOne(UserData);
-  export const deleteUser = CrudFactory.deleteOne(UserData);
+  export const getUser = CrudFactory.getOne(User);
+  export const getAllUsers = CrudFactory.getAll(User);
+  export const updateUser = CrudFactory.updateOne(User);
+  export const deleteUser = CrudFactory.deleteOne(User);
 }
 
 export default UserController;

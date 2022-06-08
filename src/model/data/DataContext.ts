@@ -22,6 +22,7 @@ class DataContext {
       password: process.env.SEED_PSW || 'admin',
       firstName: process.env.SEED_FIRSTNAME || 'Arystoteles',
       lastName: process.env.SEED_LASTNAME || 'Admin',
+      country: process.env.SEED_COUNTRY || 'Ukraine',
       role: UserRole.Seed,
     });
     seed

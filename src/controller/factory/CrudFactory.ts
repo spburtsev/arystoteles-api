@@ -1,6 +1,6 @@
-import { catchAsync } from '../../lib/functional';
+import catchAsync from '../../lib/helpers/catch-async';
 import AppError from '../../model/error/AppError';
-import { Model } from 'mongoose';
+import { Model, Query } from 'mongoose';
 import ExtensionService from '../../controller/service/ExtensionService';
 
 namespace CrudFactory {

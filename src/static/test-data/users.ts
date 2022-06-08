@@ -7,13 +7,15 @@ const users = [
     role: UserRole.Caregiver,
     firstName: 'Anton',
     lastName: 'S',
+    country: 'Ukraine',
   },
   {
     email: 'hryhorii.petrenko@nure.ua',
     password: 'iEnjoyMyLife!@',
-    role: UserRole.Medic,
+    role: UserRole.OrganizationAdministrator,
     firstName: 'Hryhorii',
     lastName: 'Petrenko',
+    country: 'Ukraine',
   },
   {
     email: 'anton.sirman@gmail.com',
@@ -21,6 +23,7 @@ const users = [
     role: UserRole.Caregiver,
     firstName: 'Anton',
     lastName: 'Sirman',
+    country: 'Ukraine',
   },
   {
     email: 'svitlana.s@gmail.com',
@@ -28,6 +31,7 @@ const users = [
     role: UserRole.Caregiver,
     firstName: 'Svitlana',
     lastName: 'S',
+    country: 'Ukraine',
   },
   {
     email: 'olena.who@gmail.com',
@@ -35,6 +39,7 @@ const users = [
     role: UserRole.Medic,
     firstName: 'Olena',
     lastName: 'Who',
+    country: 'Ukraine',
   },
 ];
 export default users;

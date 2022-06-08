@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import dbConnectionString from '../lib/helpers/get-db-connection-string';
 import { spawn } from 'child_process';
-import { catchAsync } from '../lib/functional';
+import catchAsync from '../lib/helpers/catch-async';
 import path from 'path';
 import fs from 'fs/promises';
 

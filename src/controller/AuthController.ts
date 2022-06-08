@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import AppError from '../model/error/AppError';
 import User, { IUser } from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
-import { catchAsync } from '../lib/functional';
+import catchAsync from '../lib/helpers/catch-async';
 import UserRole, { securedRoles } from '../model/enum/UserRole';
 import EmailService from '../controller/service/EmailService';
 

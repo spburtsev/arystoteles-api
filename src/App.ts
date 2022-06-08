@@ -9,6 +9,7 @@ import AppError from './model/error/AppError';
 import errorMiddleware from './middleware/error-middleware';
 import userRouter from './router/user-router';
 import backupRouter from './router/backup-router';
+import caregiverRouter from './router/caregiver-router';
 
 namespace App {
   export const create = () => {
@@ -39,6 +40,7 @@ namespace App {
 
     app.use('/api/v1/users', userRouter);
     app.use('/api/v1/backups', backupRouter);
+    app.use('/api/v1/caregivers', caregiverRouter);
 
     app.all('*', (req, _res, next) => {
       next(new AppError(`Route ${req.originalUrl} not found.`, 404));

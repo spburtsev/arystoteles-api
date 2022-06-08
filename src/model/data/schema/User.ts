@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import Organization from './Organization';
 import Caregiver from './Caregiver';
 import Medic from './Medic';
+import AppLocale from '../../enum/AppLocale';
 
 export interface IUser extends Document {
   email: string;
@@ -15,6 +16,9 @@ export interface IUser extends Document {
   isActive: boolean;
   firstName: string;
   lastName: string;
+  country: string;
+  city?: string;
+  preferredLocale?: AppLocale;
 
   passwordChangedAt: Date;
   passwordResetToken: string;
@@ -57,6 +61,20 @@ const UserSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
+  country: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: false,
+  },
+  preferredLocale: {
+    type: String,
+    required: false,
+    enum: Object.values(AppLocale),
+    default: AppLocale.English,
+  },
   passwordChangedAt: { type: Date },
   passwordResetToken: { type: String },
   passwordResetExpires: { type: Date },
@@ -80,12 +98,6 @@ UserSchema.pre<IUser>('save', function(next) {
 });
 
 UserSchema.post<IUser>('save', async function(doc, next) {
-  if (doc.role === UserRole.OrganizationAdministrator) {
-    await Organization.create({
-      administrator: doc._id,
-    });
-    return next();
-  }
   if (doc.role === UserRole.Caregiver) {
     await Caregiver.create({
       user: doc._id,
