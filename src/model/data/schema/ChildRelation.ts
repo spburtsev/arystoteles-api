@@ -11,8 +11,9 @@ export interface IChildRelation extends Document {
 
 const ChildRelationSchema = new Schema({
   relationType: {
-    type: ChildRelationType,
+    type: String,
     required: true,
+    enum: Object.values(ChildRelationType),
   },
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
   user: { type: Schema.Types.ObjectId, ref: 'User' },
