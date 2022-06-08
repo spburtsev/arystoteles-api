@@ -8,6 +8,7 @@ router.post('/', OrganizationController.createOrganization);
 router
   .route('/:id')
   .get(OrganizationController.getOrganization)
-  .patch(OrganizationController.updateOrganization);
+  .patch(OrganizationController.updateOrganization)
+  .delete(OrganizationController.deleteOrganization);
 
 export default router;
