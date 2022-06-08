@@ -12,6 +12,7 @@ import backupRouter from './router/backup-router';
 import caregiverRouter from './router/caregiver-router';
 import organizationRouter from './router/organization-router';
 import activityRouter from './router/activity-router';
+import childRouter from './router/child-router';
 
 namespace App {
   export const create = () => {
@@ -45,6 +46,7 @@ namespace App {
     app.use('/api/v1/caregivers', caregiverRouter);
     app.use('/api/v1/organizations', organizationRouter);
     app.use('/api/v1/activities', activityRouter);
+    app.use('/api/v1/children', childRouter);
 
     app.all('*', (req, _res, next) => {
       next(new AppError(`Route ${req.originalUrl} not found.`, 404));
