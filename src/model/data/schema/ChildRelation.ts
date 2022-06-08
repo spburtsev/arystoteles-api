@@ -6,7 +6,7 @@ import { IUser } from './User';
 export interface IChildRelation extends Document {
   relationType: ChildRelationType;
   child: IChild;
-  caregiver: IUser;
+  user: IUser;
 }
 
 const ChildRelationSchema = new Schema({
@@ -15,7 +15,7 @@ const ChildRelationSchema = new Schema({
     required: true,
   },
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
-  caregiverld: { type: Schema.Types.ObjectId, ref: 'User' },
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 const ChildRelation: Model<IChildRelation> = model(

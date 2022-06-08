@@ -20,6 +20,8 @@ class DataContext {
     const seed = new User({
       email: process.env.SEED_USR || 'admin@arystoteles.org',
       password: process.env.SEED_PSW || 'admin',
+      firstName: process.env.SEED_FIRSTNAME || 'Arystoteles',
+      lastName: process.env.SEED_LASTNAME || 'Admin',
       role: UserRole.Seed,
     });
     seed

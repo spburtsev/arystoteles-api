@@ -3,27 +3,15 @@ import { IUser } from './User';
 import { IChildRelation } from './ChildRelation';
 
 export interface ICaregiver extends Document {
-  firstName: string;
-  lastName: string;
   country: string;
   city: string;
-
   childRelations: Array<IChildRelation>;
   user: IUser;
 }
 
 const CaregiverSchema = new Schema({
-  firstName: {
-    type: String,
-    required: false,
-    default: '',
-  },
-  lastName: {
-    type: String,
-    required: false,
-    default: '',
-  },
-
+  country: String,
+  city: String,
   childRelations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   user: {
     type: Schema.Types.ObjectId,

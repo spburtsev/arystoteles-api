@@ -6,17 +6,21 @@ import { ICaregiver } from './Caregiver';
 export interface IDailyActivity extends Document {
   activity: IActivity;
   date: Date;
-  completed: boolean;
   child: IChild;
-  caregiver: ICaregiver;
+  caregiver?: ICaregiver;
 }
 
 const DailyActivitySchema = new Schema({
   activity: { type: Schema.Types.ObjectId, ref: 'Activity' },
   date: { type: Date, required: true },
-  completed: { type: Boolean, required: false, default: false },
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
-  caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver' },
+  caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver', required: false },
+});
+
+DailyActivitySchema.virtual<boolean>('isCompleted').get(function(
+  this: IDailyActivity,
+) {
+  return !!this.caregiver;
 });
 
 const DailyActivity: Model<IDailyActivity> = model(

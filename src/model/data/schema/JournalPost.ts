@@ -8,7 +8,6 @@ export interface IJournalPost extends Document {
   childFeeling: ChildFeeling;
   private: boolean;
   notifyMedic: boolean;
-
   child: IChild;
   caregiver: ICaregiver;
 }

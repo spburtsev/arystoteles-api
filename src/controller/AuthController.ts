@@ -45,7 +45,7 @@ const createToken = async (
 
 namespace AuthController {
   export const register = catchAsync(async (req, res, next) => {
-    const { email, password, role } = req.body;
+    const { email, password, role, firstName, lastName } = req.body;
     if (securedRoles.includes(role)) {
       return next(
         new AppError(`It is not allowed to register as ${role}`, 400),
@@ -55,6 +55,8 @@ namespace AuthController {
       email,
       password,
       role,
+      firstName,
+      lastName,
     });
     // const url = `${req.protocol}://${req.get('host')}/me`;
     // await new EmailService(user.email, url).sendWelcome();

@@ -3,26 +3,13 @@ import { IUser } from './User';
 import { IOrganization } from './Organization';
 
 export interface IMedic extends Document {
-  firstName: string;
-  lastName: string;
   title: string;
   isConfirmed: boolean;
-
   user: IUser;
   organization: IOrganization;
 }
 
 const MedicSchema = new Schema({
-  firstName: {
-    type: String,
-    required: false,
-    default: '',
-  },
-  lastName: {
-    type: String,
-    required: false,
-    default: '',
-  },
   title: {
     type: String,
     required: false,

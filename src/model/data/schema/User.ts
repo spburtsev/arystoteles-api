@@ -13,6 +13,8 @@ export interface IUser extends Document {
   password: string;
   role: UserRole;
   isActive: boolean;
+  firstName: string;
+  lastName: string;
 
   passwordChangedAt: Date;
   passwordResetToken: string;
@@ -46,6 +48,14 @@ const UserSchema = new Schema<IUser>({
     required: true,
     minlength: 6,
     select: false,
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   passwordChangedAt: { type: Date },
   passwordResetToken: { type: String },

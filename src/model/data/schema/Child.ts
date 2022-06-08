@@ -7,13 +7,11 @@ import { matchAgeGroup } from '../../../model/enum/AgeGroup';
 export interface IChild extends Document {
   firstName: string;
   birthDate: Date;
-
   birthWeightPrimary: number;
   birthWeightSecondary: number;
-  currentWeightPrimary: number;
-  currentWeightSecondary: number;
+  currentWeightPrimary?: number;
+  currentWeightSecondary?: number;
   active: boolean;
-
   relations: Array<IChildRelation>;
   journalPosts: Array<IJournalPost>;
 }
@@ -27,7 +25,6 @@ const ChildSchema = new Schema({
     type: Date,
     required: true,
   },
-
   birthWeightPrimary: {
     type: Number,
     required: true,
@@ -41,7 +38,6 @@ const ChildSchema = new Schema({
     required: false,
     default: true,
   },
-
   currentWeightPrimary: {
     type: Number,
     required: false,
@@ -50,7 +46,6 @@ const ChildSchema = new Schema({
     type: Number,
     required: false,
   },
-
   relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
 });
