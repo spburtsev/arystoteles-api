@@ -5,7 +5,6 @@ import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
 import Child, { IChild } from '../model/data/schema/Child';
 import CrudFactory from './factory/CrudFactory';
-import User, { IUser } from '../model/data/schema/User';
 import Caregiver, { ICaregiver } from '../model/data/schema/Caregiver';
 
 const accessAttributes = [
@@ -23,18 +22,18 @@ const attachChildRelation = async (
   relationType: ChildRelationType,
 ) => {
   const rel = await ChildRelation.create({
-    user: caregiver.user._id,
+    user: caregiver.user,
     child: child._id,
     relationType,
   });
   await caregiver.update({
     $push: {
-      childRelations: child._id,
+      childRelations: rel._id,
     },
   });
   await child.update({
     $push: {
-      relations: rel,
+      relations: rel._id,
     },
   });
 };
@@ -49,7 +48,7 @@ namespace ChildController {
 
     const childAttributes = _.pick(req.body, accessAttributes) as IChild;
     const { relation } = req.body;
-    const child = await Child.create({ childAttributes });
+    const child = await Child.create(childAttributes);
     await attachChildRelation(caregiver, child, relation);
 
     res.status(200).json({
