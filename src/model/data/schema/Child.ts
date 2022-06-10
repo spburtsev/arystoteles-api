@@ -1,7 +1,9 @@
-import { Model, Schema, Document, model, VirtualType } from 'mongoose';
+import { Model, Schema, Document, model } from 'mongoose';
 import { IChildRelation } from './ChildRelation';
 import { IJournalPost } from './JournalPost';
 import { IDailyActivity } from './DailyActivity';
+import { IScreening } from './Screening';
+import Question, { IQuestion } from './Question';
 import { monthsPassed } from '../../../lib/helpers/month-difference';
 import AgeGroup, { matchAgeGroup } from '../../../model/enum/AgeGroup';
 
@@ -17,6 +19,9 @@ export interface IChild extends Document {
   journalPosts: Array<IJournalPost>;
   dailyActivities: Array<IDailyActivity>;
   ageGroup: AgeGroup;
+  screenings: Array<IScreening>;
+
+  getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
 }
 
 const ChildSchema = new Schema({
@@ -52,6 +57,7 @@ const ChildSchema = new Schema({
   relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
   dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],
+  screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
 });
 
 ChildSchema.virtual('ageGroup').get(function(this: IChild) {
@@ -86,6 +92,13 @@ ChildSchema.virtual('currentWeightPound').get(function(this: IChild) {
     secondary: this.currentWeightSecondary * 0.035274, // Ounces
   };
 });
+
+ChildSchema.methods.getScreeningQuestions = async function() {
+  const relevantQuestions = await Question.find({
+    ageGroup: this.ageGroup,
+  });
+  return relevantQuestions;
+};
 
 const Child: Model<IChild> = model('Child', ChildSchema);
 export default Child;

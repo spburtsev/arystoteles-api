@@ -6,7 +6,13 @@ import Child, { IChild } from '../model/data/schema/Child';
 import monthDifference from '../lib/helpers/month-difference';
 
 const createNewScreening = async (child: IChild) => {
-  // Create a new screening
+  const questions = await child.getScreeningQuestions();
+  const screening = new Screening({
+    //
+  });
+  const savedScreening = await screening.save();
+  child.screenings.push(savedScreening);
+  await child.save();
 };
 
 namespace ScreeningController {
@@ -44,7 +50,7 @@ namespace ScreeningController {
     }
     screening = await createNewScreening(child);
 
-    res.status(200).json({ mappedActivities });
+    res.status(200).json({ screening });
   });
 
   export const createScreening = CrudFactory.createOne(Screening);
