@@ -1,11 +1,9 @@
 import catchAsync from '../lib/helpers/catch-async';
-import { IUser } from '../model/data/schema/User';
 import DailyActivity, {
   IDailyActivity,
 } from '../model/data/schema/DailyActivity';
 import Activity from '../model/data/schema/Activity';
 import AppError from '../model/error/AppError';
-import ChildRelation from '../model/data/schema/ChildRelation';
 import Child from '../model/data/schema/Child';
 import Caregiver from 'src/model/data/schema/Caregiver';
 
@@ -45,7 +43,7 @@ namespace DailyActivityController {
     const childId = req.params.childId;
 
     let dailyActivities = await DailyActivity.find({
-      childId,
+      child: childId,
     }).exec();
     if (dailyActivities.length === 0) {
       dailyActivities = await populateDailyActivities(childId);
