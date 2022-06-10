@@ -1,8 +1,9 @@
-import { Model, Schema, Document, model } from 'mongoose';
+import { Model, Schema, Document, model, VirtualType } from 'mongoose';
 import { IChildRelation } from './ChildRelation';
 import { IJournalPost } from './JournalPost';
+import { IDailyActivity } from './DailyActivity';
 import { monthsPassed } from '../../../lib/helpers/month-difference';
-import { matchAgeGroup } from '../../../model/enum/AgeGroup';
+import AgeGroup, { matchAgeGroup } from '../../../model/enum/AgeGroup';
 
 export interface IChild extends Document {
   firstName: string;
@@ -14,6 +15,8 @@ export interface IChild extends Document {
   active: boolean;
   relations: Array<IChildRelation>;
   journalPosts: Array<IJournalPost>;
+  dailyActivities: Array<IDailyActivity>;
+  ageGroup: AgeGroup;
 }
 
 const ChildSchema = new Schema({
@@ -48,6 +51,7 @@ const ChildSchema = new Schema({
   },
   relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
+  dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],
 });
 
 ChildSchema.virtual('ageGroup').get(function(this: IChild) {

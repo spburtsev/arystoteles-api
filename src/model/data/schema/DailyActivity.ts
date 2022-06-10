@@ -8,6 +8,16 @@ export interface IDailyActivity extends Document {
   date: Date;
   child: IChild;
   caregiver?: ICaregiver;
+  isCompleted: boolean;
+
+  transform: () => {
+    activity: IActivity;
+    date: Date;
+    child: IChild;
+    completed: boolean;
+  };
+
+  complete: (value: boolean, caregiver: ICaregiver) => void;
 }
 
 const DailyActivitySchema = new Schema({
@@ -17,11 +27,28 @@ const DailyActivitySchema = new Schema({
   caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver', required: false },
 });
 
-DailyActivitySchema.virtual<boolean>('isCompleted').get(function(
-  this: IDailyActivity,
-) {
+DailyActivitySchema.virtual('isCompleted').get(function() {
   return !!this.caregiver;
 });
+
+DailyActivitySchema.methods.transform = function() {
+  return {
+    activity: this.activity,
+    date: this.date,
+    child: this.child,
+    isCompleted: this.isCompleted,
+  };
+};
+
+DailyActivitySchema.methods.complete = function(
+  value: boolean,
+  caregiver: ICaregiver,
+) {
+  if (value === this.isCompleted) {
+    throw new Error('DailyActivity is already completed');
+  }
+  this.caregiver = value ? caregiver : undefined;
+};
 
 const DailyActivity: Model<IDailyActivity> = model(
   'DailyActivity',
