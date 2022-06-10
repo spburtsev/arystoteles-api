@@ -7,13 +7,16 @@ class _Expectation extends mongoose.SchemaType {
   }
 
   public cast(val: any) {
-    let _val: Expectation;
+    let _val: Expectation = {
+      value: null,
+      ageGroup: null,
+    };
 
     if (typeof val.value !== 'number') {
       throw new Error(`'value' attribute is not present in val: ${val}`);
     }
     _val.value = val.value;
-    if (typeof val.ageGroup !== 'string') {
+    if (typeof val.ageGroup !== 'number') {
       throw new Error(`'ageGroup' attribute is not present in val: ${val}`);
     }
     _val.ageGroup = val.ageGroup;

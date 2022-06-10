@@ -8,16 +8,18 @@ class _Option extends mongoose.SchemaType {
   }
 
   public cast(val: any) {
-    let _val: Option;
+    let _val: Option = {
+      value: null,
+      text: {
+        [AppLocale.English]: null,
+        [AppLocale.Ukrainian]: null,
+      },
+    };
 
     if (typeof val.value !== 'number') {
       throw new Error(`'value' attribute is not present in val: ${val}`);
     }
     _val.value = val.value;
-    _val.text = {
-      [AppLocale.English]: '',
-      [AppLocale.Ukrainian]: '',
-    };
     for (const locale of Object.values(AppLocale) as string[]) {
       if (typeof val.text[locale] !== 'string') {
         throw new Error(`Locale ${locale} is not present in val: ${val.text}`);

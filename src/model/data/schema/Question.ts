@@ -15,9 +15,9 @@ export interface IQuestion extends Document {
 }
 
 const QuestionSchema = new Schema({
-  text: _LocalizedString,
-  options: [_Option],
-  expectations: [_Expectation],
+  text: { type: _LocalizedString },
+  options: [{ type: _Option }],
+  expectations: [{ type: _Expectation }],
   category: { type: String, enum: Object.values(QuestionCategory) },
 });
 
