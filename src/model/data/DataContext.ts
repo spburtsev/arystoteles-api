@@ -1,9 +1,11 @@
 import Database from './Database';
 import User from './schema/User';
 import Activity from './schema/Activity';
+import Question from './schema/Question';
 import UserRole from '../enum/UserRole';
 import users from '../../static/test-data/users';
 import activities from '../../static/test-data/activities';
+import questions from '../../static/test-data/questions';
 import AppLocale from '../enum/AppLocale';
 
 class DataContext {
@@ -58,6 +60,19 @@ class DataContext {
         })
         .catch((err: Error) => {
           console.error('Error creating activity:', err);
+        });
+    });
+    questions.forEach(question => {
+      const newQuestion = new Question(question);
+      newQuestion
+        .save()
+        .then(() => {
+          console.log(
+            `Question ${newQuestion.text[AppLocale.English]} created`,
+          );
+        })
+        .catch((err: Error) => {
+          console.error('Error creating question:', err);
         });
     });
   }
