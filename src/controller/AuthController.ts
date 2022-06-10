@@ -112,6 +112,8 @@ namespace AuthController {
     }
     req.user = currentUser;
     res.locals.user = currentUser;
+    req.locale = currentUser.preferredLocale;
+    res.locals.locale = currentUser.preferredLocale;
     next();
   });
 

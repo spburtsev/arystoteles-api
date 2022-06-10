@@ -1,3 +1,4 @@
+import AppLocale from 'src/model/enum/AppLocale';
 import UserRole from '../model/enum/UserRole';
 
 export {};
@@ -8,6 +9,7 @@ declare global {
         id?: string;
         role?: UserRole;
       };
+      locale?: AppLocale;
     }
   }
 }
