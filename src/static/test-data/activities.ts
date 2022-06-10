@@ -2,7 +2,6 @@ import AgeGroup from '../../model/enum/AgeGroup';
 import ActivityCategory from '../../model/enum/ActivityCategory';
 import ActivityFrequency from '../../model/enum/ActivityFrequency';
 import AppLocale from '../../model/enum/AppLocale';
-import LocalizedString from 'src/model/data/LocalizedString';
 
 const activities = [
   {
