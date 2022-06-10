@@ -4,6 +4,7 @@ import _Expectation from './types/_Expectation';
 import { IQuestion } from './Question';
 import { IChild } from './Child';
 import { ICaregiver } from './Caregiver';
+import ScreeningResult from '../../enum/ScreeningResult';
 
 export interface IScreening extends Document {
   questions: Array<IQuestion>;
@@ -12,6 +13,7 @@ export interface IScreening extends Document {
   caregiver: ICaregiver;
   createdAt: Date;
   updatedAt?: Date;
+  result?: ScreeningResult;
 }
 
 const ScreeningSchema = new Schema({
@@ -21,6 +23,11 @@ const ScreeningSchema = new Schema({
   caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver' },
   createdAt: { type: Date },
   updatedAt: { type: Date, required: false },
+  result: {
+    type: String,
+    enum: Object.values(ScreeningResult),
+    required: false,
+  },
 });
 
 const Screening: Model<IScreening> = model('Screening', ScreeningSchema);

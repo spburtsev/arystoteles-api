@@ -15,6 +15,9 @@ import organizationRouter from './router/organization-router';
 import activityRouter from './router/activity-router';
 import childRouter from './router/child-router';
 import questionRouter from './router/question-router';
+import notificationRouter from './router/notification-router';
+import screeningRouter from './router/screening-router';
+import tipRouter from './router/tip-router';
 
 namespace App {
   export const create = () => {
@@ -50,6 +53,9 @@ namespace App {
     app.use('/api/v1/activities', activityRouter);
     app.use('/api/v1/children', childRouter);
     app.use('/api/v1/questions', questionRouter);
+    app.use('/api/v1/notifications', notificationRouter);
+    app.use('/api/v1/screenings', screeningRouter);
+    app.use('/api/v1/tips', tipRouter);
 
     app.all('*', (req, _res, next) => {
       next(new AppError(`Route ${req.originalUrl} not found.`, 404));
