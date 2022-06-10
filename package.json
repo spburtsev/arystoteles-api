@@ -9,7 +9,8 @@
   "scripts": {
     "start": "ts-node src/.ts",
     "dev": "nodemon src/index.ts",
-    "test": "ts-mocha test/*.test.ts"
+    "test": "jest -c ./jest.unit.json",
+    "test:coverage": "jest -c ./jest.unit.json --coverage"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
