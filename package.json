@@ -9,7 +9,7 @@
   "scripts": {
     "start": "ts-node src/.ts",
     "dev": "nodemon src/index.ts",
-    "test": "mocha test/*.test.ts"
+    "test": "ts-mocha test/*.test.ts"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

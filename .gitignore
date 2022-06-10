@@ -3,3 +3,7 @@
 .yarnclean
 node_modules
 *.log
+
+dist
+log
+backup
