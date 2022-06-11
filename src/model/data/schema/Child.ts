@@ -96,7 +96,7 @@ ChildSchema.virtual('currentWeightPound').get(function(this: IChild) {
 ChildSchema.methods.getScreeningQuestions = async function() {
   const relevantQuestions = await Question.find({
     ageGroup: this.ageGroup,
-  });
+  }).exec();
   return relevantQuestions;
 };
 

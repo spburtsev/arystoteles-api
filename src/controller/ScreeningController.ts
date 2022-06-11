@@ -4,15 +4,21 @@ import catchAsync from '../lib/helpers/catch-async';
 import AppError from '../model/error/AppError';
 import Child, { IChild } from '../model/data/schema/Child';
 import monthDifference from '../lib/helpers/month-difference';
+import Caregiver, { ICaregiver } from 'src/model/data/schema/Caregiver';
 
-const createNewScreening = async (child: IChild) => {
+const createNewScreening = async (child: IChild, caregiver: ICaregiver) => {
   const questions = await child.getScreeningQuestions();
   const screening = new Screening({
-    //
+    questions,
+    child,
+    caregiver,
+    answers: [],
+    createdAt: new Date(),
   });
   const savedScreening = await screening.save();
   child.screenings.push(savedScreening);
   await child.save();
+  return savedScreening;
 };
 
 namespace ScreeningController {
@@ -24,10 +30,11 @@ namespace ScreeningController {
    */
   export const getMonthlyScreening = catchAsync(async (req, res, next) => {
     const childId = req.params.childId;
-    const child = await Child.findById(childId);
+    const child = await Child.findById(childId, 'relations');
     if (!child) {
       return next(new AppError('Child not found', 404));
     }
+    const caregiver = await Caregiver.findOne({ user: req.user.id });
     const currentDate = new Date();
     let screening: IScreening;
     let screenings = await Screening.find({
@@ -48,7 +55,7 @@ namespace ScreeningController {
         );
       }
     }
-    screening = await createNewScreening(child);
+    screening = await createNewScreening(child, caregiver);
 
     res.status(200).json({ screening });
   });
