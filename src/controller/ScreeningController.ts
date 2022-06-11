@@ -4,7 +4,7 @@ import catchAsync from '../lib/helpers/catch-async';
 import AppError from '../model/error/AppError';
 import Child, { IChild } from '../model/data/schema/Child';
 import monthDifference from '../lib/helpers/month-difference';
-import Caregiver, { ICaregiver } from 'src/model/data/schema/Caregiver';
+import Caregiver, { ICaregiver } from '../model/data/schema/Caregiver';
 
 const createNewScreening = async (child: IChild, caregiver: ICaregiver) => {
   const questions = await child.getScreeningQuestions();
