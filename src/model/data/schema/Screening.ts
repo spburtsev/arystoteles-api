@@ -5,6 +5,7 @@ import { IQuestion } from './Question';
 import { IChild } from './Child';
 import { ICaregiver } from './Caregiver';
 import ScreeningResult from '../../enum/ScreeningResult';
+import AppLocale from '../../enum/AppLocale';
 
 export interface IScreening extends Document {
   questions: Array<IQuestion>;
@@ -15,6 +16,7 @@ export interface IScreening extends Document {
   updatedAt?: Date;
   result?: ScreeningResult;
 
+  localized: (locale: AppLocale) => any;
   estimateResult: () => void;
 }
 
@@ -47,6 +49,20 @@ ScreeningSchema.methods.estimateResult = async function() {
     percentage >= 0.5
       ? ScreeningResult.MeetsExpectations
       : ScreeningResult.NeedsReview;
+};
+
+ScreeningSchema.methods.localized = function(locale: AppLocale) {
+  return {
+    id: this._id,
+    totalQuestions: this.questions.length,
+    questions: this.questions.map(question => question.localized(locale)),
+    answers: this.answers,
+    child: this.child,
+    caregiver: this.caregiver,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+    result: this.result,
+  };
 };
 
 const Screening: Model<IScreening> = model('Screening', ScreeningSchema);

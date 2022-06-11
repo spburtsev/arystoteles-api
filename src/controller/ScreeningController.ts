@@ -44,10 +44,14 @@ namespace ScreeningController {
       child: childId,
       caregiver: caregiver._id,
     })
+      .populate('questions')
       .sort({ createdAt: 'desc' })
       .exec();
 
-    res.status(200).json({ screenings });
+    res.status(200).json({
+      total: screenings.length,
+      screenings: screenings.map(screening => screening.localized(req.locale)),
+    });
   });
 
   /**
@@ -86,7 +90,7 @@ namespace ScreeningController {
     }
     screening = await createNewScreening(child, caregiver);
 
-    res.status(200).json({ screening });
+    res.status(200).json({ screening: screening.localized(req.locale) });
   });
 
   /**
@@ -94,12 +98,16 @@ namespace ScreeningController {
    *
    * Expected request params:
    * * `id: string` - Screening Id.
+   *
+   * Expected request body:
+   * * `answers: number[]` - Screening answers, must match the questions number.
    */
   export const modifyScreening = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const screening = await Screening.findById(id)
-      .populate('caregiver')
+      .populate('caregiver questions child')
       .exec();
+
     if (!screening) {
       return next(new AppError('Screening not found', 404));
     }

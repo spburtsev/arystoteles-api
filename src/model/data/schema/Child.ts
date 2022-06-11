@@ -97,6 +97,7 @@ ChildSchema.methods.getScreeningQuestions = async function() {
   const relevantQuestions = await Question.find({
     expectations: { $elemMatch: { ageGroup: this.ageGroup } },
   }).exec();
+
   return relevantQuestions;
 };
 

@@ -4,7 +4,7 @@ import ChildRelation from '../../model/data/schema/ChildRelation';
 
 const secureChildDataAccess = catchAsync(async (req, res, next) => {
   const { id } = req.user;
-  const childId = req.params.childId;
+  const { childId } = req.params;
 
   const isRelated = await ChildRelation.find({
     user: id,
