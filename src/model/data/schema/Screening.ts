@@ -14,6 +14,8 @@ export interface IScreening extends Document {
   createdAt: Date;
   updatedAt?: Date;
   result?: ScreeningResult;
+
+  estimateResult: () => void;
 }
 
 const ScreeningSchema = new Schema({
@@ -29,6 +31,23 @@ const ScreeningSchema = new Schema({
     required: false,
   },
 });
+
+ScreeningSchema.methods.estimateResult = async function() {
+  let passedAnswers = 0;
+  this.questions.forEach((question: IQuestion, index) => {
+    const relevantExpectation = question.expectations.find(
+      x => x.ageGroup === this.child.ageGroup,
+    ).value;
+    if (this.options[this.answers[index]] === relevantExpectation) {
+      ++passedAnswers;
+    }
+  });
+  const percentage = passedAnswers / this.questions.length;
+  this.result =
+    percentage >= 0.5
+      ? ScreeningResult.MeetsExpectations
+      : ScreeningResult.NeedsReview;
+};
 
 const Screening: Model<IScreening> = model('Screening', ScreeningSchema);
 export default Screening;

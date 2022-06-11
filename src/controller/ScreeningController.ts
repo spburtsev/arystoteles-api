@@ -10,8 +10,8 @@ const createNewScreening = async (child: IChild, caregiver: ICaregiver) => {
   const questions = await child.getScreeningQuestions();
   const screening = new Screening({
     questions,
-    child,
-    caregiver,
+    child: child._id,
+    caregiver: caregiver._id,
     answers: [],
     createdAt: new Date(),
   });
@@ -23,14 +23,42 @@ const createNewScreening = async (child: IChild, caregiver: ICaregiver) => {
 
 namespace ScreeningController {
   /**
+   * Get a screening history for a child.
+   *
+   * Expected request params:
+   * * `childId: string` - Child id.
+   */
+  export const getScreeningHistory = catchAsync(async (req, res, next) => {
+    const { childId } = req.params;
+    const child = await Child.findById(childId);
+    if (!child) {
+      return next(new AppError('Child not found', 404));
+    }
+    const caregiver = await Caregiver.findOne({
+      user: req.user.id,
+    });
+    if (!caregiver) {
+      return next(new AppError('Caregiver not found', 404));
+    }
+    const screenings = await Screening.find({
+      child: childId,
+      caregiver: caregiver._id,
+    })
+      .sort({ createdAt: 'desc' })
+      .exec();
+
+    res.status(200).json({ screenings });
+  });
+
+  /**
    * Get a monthly screening for a child.
    *
    * Expected request params:
    * * `childId: string` - Child id.
    */
   export const getMonthlyScreening = catchAsync(async (req, res, next) => {
-    const childId = req.params.childId;
-    const child = await Child.findById(childId, 'relations');
+    const { childId } = req.params;
+    const child = await Child.findById(childId);
     if (!child) {
       return next(new AppError('Child not found', 404));
     }
@@ -39,6 +67,7 @@ namespace ScreeningController {
     let screening: IScreening;
     let screenings = await Screening.find({
       child: childId,
+      caregiver: caregiver._id,
     })
       .sort({ createdAt: 'desc' })
       .exec();
@@ -58,6 +87,31 @@ namespace ScreeningController {
     screening = await createNewScreening(child, caregiver);
 
     res.status(200).json({ screening });
+  });
+
+  /**
+   * Modify a screening for a child by updating answers.
+   *
+   * Expected request params:
+   * * `id: string` - Screening Id.
+   */
+  export const modifyScreening = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const screening = await Screening.findById(id)
+      .populate('caregiver')
+      .exec();
+    if (!screening) {
+      return next(new AppError('Screening not found', 404));
+    }
+    const { answers } = req.body;
+    if (answers.length !== screening.questions.length) {
+      return next(new AppError('Invalid number of answers', 400));
+    }
+    screening.answers = answers;
+    screening.updatedAt = new Date();
+    screening.estimateResult();
+    const savedScreening = await screening.save();
+    res.status(200).json({ screening: savedScreening });
   });
 
   export const createScreening = CrudFactory.createOne(Screening);
