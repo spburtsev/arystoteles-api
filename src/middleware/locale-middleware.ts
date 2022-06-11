@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import AppLocale from '../model/enum/AppLocale';
 
-const matchLocale = (headerValue: string) => {
-  const locale = headerValue.split(',')[0];
+const matchLocale = (headerValue?: string) => {
+  const locale = headerValue?.split(',')[0];
   if (locale === 'uk') {
     return AppLocale.Ukrainian;
   }
@@ -10,8 +10,7 @@ const matchLocale = (headerValue: string) => {
 };
 
 const localeMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const acceptedLanguage = req.headers['accept-language'];
-  const matchedLocale = matchLocale(acceptedLanguage);
+  const matchedLocale = matchLocale(req.headers['accept-language']);
   req.locale = matchedLocale;
   res.locals.locale = matchedLocale;
   next();

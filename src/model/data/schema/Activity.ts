@@ -1,7 +1,8 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import ActivityCategory from '../../../model/enum/ActivityCategory';
-import ActivityFrequency from '../../../model/enum/ActivityFrequency';
-import AgeGroup from '../../../model/enum/AgeGroup';
+import AppLocale from '../../enum/AppLocale';
+import ActivityCategory from '../../enum/ActivityCategory';
+import ActivityFrequency from '../../enum/ActivityFrequency';
+import AgeGroup from '../../enum/AgeGroup';
 import LocalizedString from '../LocalizedString';
 import _LocalizedString from './types/_LocalizedString';
 
@@ -12,6 +13,8 @@ export interface IActivity extends Document {
   frequency: ActivityFrequency;
   title: LocalizedString;
   description: LocalizedString;
+
+  localized: (locale: AppLocale) => any;
 }
 
 const ActivitySchema = new Schema({
@@ -30,6 +33,16 @@ const ActivitySchema = new Schema({
   title: { type: _LocalizedString, required: true },
   description: { type: _LocalizedString, required: true },
 });
+
+ActivitySchema.methods.localized = function(locale: AppLocale) {
+  return {
+    category: this.category,
+    duration: this.duration,
+    frequency: this.frequency,
+    title: this.title[locale],
+    description: this.description[locale],
+  };
+};
 
 const Activity: Model<IActivity> = model('Activity', ActivitySchema);
 export default Activity;

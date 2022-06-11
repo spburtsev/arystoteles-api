@@ -2,6 +2,7 @@ import { Model, Schema, Document, model } from 'mongoose';
 import { IActivity } from './Activity';
 import { IChild } from './Child';
 import { ICaregiver } from './Caregiver';
+import AppLocale from '../../enum/AppLocale';
 
 export interface IDailyActivity extends Document {
   activity: IActivity;
@@ -10,12 +11,7 @@ export interface IDailyActivity extends Document {
   caregiver?: ICaregiver;
   isCompleted: boolean;
 
-  transform: () => {
-    activity: IActivity;
-    date: Date;
-    child: IChild;
-    completed: boolean;
-  };
+  transform: (locale: AppLocale) => any;
 
   complete: (value: boolean, caregiver: ICaregiver) => void;
 }
@@ -31,11 +27,10 @@ DailyActivitySchema.virtual('isCompleted').get(function() {
   return !!this.caregiver;
 });
 
-DailyActivitySchema.methods.transform = function() {
+DailyActivitySchema.methods.transform = function(locale: AppLocale) {
   return {
-    activity: this.activity,
-    date: this.date,
-    child: this.child,
+    id: this._id,
+    activity: this.activity.localized(locale),
     isCompleted: this.isCompleted,
   };
 };

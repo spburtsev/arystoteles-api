@@ -18,6 +18,7 @@ import questionRouter from './router/question-router';
 import notificationRouter from './router/notification-router';
 import screeningRouter from './router/screening-router';
 import tipRouter from './router/tip-router';
+import dailyActivityRouter from './router/daily-activity-router';
 
 namespace App {
   export const create = () => {
@@ -56,6 +57,7 @@ namespace App {
     app.use('/api/v1/notifications', notificationRouter);
     app.use('/api/v1/screenings', screeningRouter);
     app.use('/api/v1/tips', tipRouter);
+    app.use('/api/v1/daily-activities', dailyActivityRouter);
 
     app.all('*', (req, _res, next) => {
       next(new AppError(`Route ${req.originalUrl} not found.`, 404));

@@ -5,7 +5,7 @@ import DailyActivity, {
 import Activity from '../model/data/schema/Activity';
 import AppError from '../model/error/AppError';
 import Child from '../model/data/schema/Child';
-import Caregiver from 'src/model/data/schema/Caregiver';
+import Caregiver from '../model/data/schema/Caregiver';
 
 const populateDailyActivities = async (childId: string) => {
   const child = await Child.findById(childId);
@@ -41,21 +41,33 @@ namespace DailyActivityController {
    */
   export const getDailyActivities = catchAsync(async (req, res, next) => {
     const childId = req.params.childId;
-
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 1);
     let dailyActivities = await DailyActivity.find({
       child: childId,
-    }).exec();
+      date: { $gte: currentDate },
+    })
+      .populate('activity')
+      .exec();
     if (dailyActivities.length === 0) {
       dailyActivities = await populateDailyActivities(childId);
     }
+    const date = dailyActivities[0].date;
+    const child = dailyActivities[0].child;
+
     const mappedActivities = dailyActivities.map(activity =>
-      activity.transform(),
+      activity.transform(req.locale),
     );
-    res.status(200).json({ mappedActivities });
+    res.status(200).json({
+      date,
+      childId: child,
+      total: mappedActivities.length,
+      activities: mappedActivities,
+    });
   });
 
   /**
-   * Get all daily activities for a child.
+   * Update a daily activity for a child.
    *
    * Expected request params:
    * * `id: string` - DailyActivity id.
@@ -64,7 +76,7 @@ namespace DailyActivityController {
    * * `completed: boolean` - completed attribute value to set.
    */
   export const updateDailyActivity = catchAsync(async (req, res, next) => {
-    const { id } = req.params;
+    const id = req.params.id;
     const { completed } = req.body;
     const dailyActivity = await DailyActivity.findById(id);
     if (!dailyActivity) {
