@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import dbConnectionString from '../lib/helpers/get-db-connection-string';
+import getDbConnectionString, {
+  getDbUri,
+} from '../lib/helpers/get-db-connection-string';
 import { spawn } from 'child_process';
 import catchAsync from '../lib/helpers/catch-async';
+import BackupMethod from '../model/enum/BackupMethod';
+import RestoreMethod from '../model/enum/RestoreMethod';
 import path from 'path';
 import fs from 'fs/promises';
 
@@ -9,17 +13,21 @@ const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
 
 const dumpBackup = () => {
   const archivePath = backupPath(Date.now().toString());
-  return spawn('mongodump', [
-    `${dbConnectionString}`,
+  const uri = getDbConnectionString();
+  const proc = spawn('mongodump', [
+    `${uri}`,
     `--archive=./${archivePath}`,
     '--gzip',
   ]);
+
+  return proc;
 };
 
 const restore = (fileName: string) => {
+  const uri = getDbConnectionString();
   const archivePath = backupPath(fileName);
   return spawn('mongorestore', [
-    `${dbConnectionString}`,
+    `${uri}`,
     `--archive=./${archivePath}`,
     '--gzip',
     '--drop',
@@ -29,7 +37,7 @@ const restore = (fileName: string) => {
 const readExistingBackups = async () => {
   const backupPath = path.join(__dirname, '../../backup/');
   const backups = await fs.readdir(backupPath, 'utf-8');
-  return backups;
+  return backups.map(backup => backup.split('.gz')[0]);
 };
 
 namespace BackupController {
@@ -44,11 +52,6 @@ namespace BackupController {
     _next: NextFunction,
   ) => {
     const dumpProcess = dumpBackup();
-    dumpProcess.on('error', error => {
-      return res.status(500).json({
-        message: error.message,
-      });
-    });
 
     dumpProcess.on('exit', (code, signal) => {
       if (code) {
