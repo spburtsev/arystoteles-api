@@ -5,7 +5,8 @@ import { IDailyActivity } from './DailyActivity';
 import { IScreening } from './Screening';
 import Question, { IQuestion } from './Question';
 import { monthsPassed } from '../../../lib/helpers/month-difference';
-import AgeGroup, { matchAgeGroup } from '../../../model/enum/AgeGroup';
+import AgeGroup, { matchAgeGroup } from '../../enum/AgeGroup';
+import Gender from '../../enum/Gender';
 
 export interface IChild extends Document {
   firstName: string;
@@ -20,6 +21,7 @@ export interface IChild extends Document {
   dailyActivities: Array<IDailyActivity>;
   ageGroup: AgeGroup;
   screenings: Array<IScreening>;
+  gender: Gender;
 
   getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
 }
@@ -53,6 +55,11 @@ const ChildSchema = new Schema({
   currentWeightSecondary: {
     type: Number,
     required: false,
+  },
+  gender: {
+    type: String,
+    enum: Object.values(Gender),
+    required: true,
   },
   relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
