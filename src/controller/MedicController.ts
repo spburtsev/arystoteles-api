@@ -69,6 +69,26 @@ namespace MedicController {
     });
   });
 
+  export const confirm = catchAsync(async (req, res, next) => {
+    const medicId = req.params.id;
+    const medic = await Medic.findById(medicId);
+    if (!medic) {
+      return next(new AppError('Medic not found', 404));
+    }
+    const organization = await User.findById(medic.organization);
+    if (!organization || organization._id !== req.user.id) {
+      return next(new AppError('You cannot perform this operation', 400));
+    }
+    medic.isConfirmed = true;
+    await medic.save();
+    res.status(200).json({
+      status: 'success',
+      data: {
+        medic,
+      },
+    });
+  });
+
   export const getMedic = CrudFactory.getOne(Medic);
   export const getAllMedics = CrudFactory.getAll(Medic);
   export const updateMedic = CrudFactory.updateOne(Medic);

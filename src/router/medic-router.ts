@@ -9,6 +9,7 @@ router.use(AuthController.protect);
 
 router.get('/me', MedicController.getSelf);
 router.patch('/updateMe', MedicController.updateSelf);
+router.patch('/confirm/:id', MedicController.confirm);
 router.route('/').get(MedicController.getAllMedics);
 router.route('/:id').get(MedicController.getMedic);
 

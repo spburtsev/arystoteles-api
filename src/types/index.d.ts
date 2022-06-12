@@ -3,6 +3,7 @@ import UserRole from '../model/enum/UserRole';
 
 export {};
 declare global {
+  type AnyFn = (...args: any[]) => any;
   namespace Express {
     interface Request {
       user?: {

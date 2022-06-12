@@ -4,7 +4,7 @@ import _ from 'lodash';
 import multer from 'multer';
 import sharp from 'sharp';
 import AppError from '../model/error/AppError';
-import catchAsync, { AnyFn } from '../lib/helpers/catch-async';
+import catchAsync from '../lib/helpers/catch-async';
 import CrudFactory from './factory/CrudFactory';
 
 const storage = multer.memoryStorage();

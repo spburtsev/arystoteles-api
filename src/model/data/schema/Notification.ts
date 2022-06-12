@@ -1,6 +1,7 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
 import NotificationType from '../../enum/NotificationType';
+import AppLocale from '../../enum/AppLocale';
 import LocalizedString from '../LocalizedString';
 
 interface INotification extends Document {
@@ -11,6 +12,8 @@ interface INotification extends Document {
   read: boolean;
   createdAt: Date;
   updatedAt?: Date;
+
+  localized(locale: AppLocale): any;
 }
 
 const NotificationSchema = new Schema({
@@ -22,6 +25,18 @@ const NotificationSchema = new Schema({
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
 });
+
+NotificationSchema.methods.localized = function(locale: AppLocale) {
+  return {
+    type: this.type,
+    user: this.user,
+    title: this.title ? this.title[locale] : null,
+    text: this.text[locale],
+    read: this.read,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt || null,
+  };
+};
 
 const Notification: Model<INotification> = model(
   'Notification',
