@@ -13,7 +13,7 @@ router.use(AuthController.restrictTo(UserRole.Admin, UserRole.Seed));
 router.get('/admin', NotificationController.getAllNotifications);
 router.post('/admin', NotificationController.createNotification);
 router
-  .route('admin/:id')
+  .route('/admin/:id')
   .get(NotificationController.getNotification)
   .patch(NotificationController.updateNotification)
   .delete(NotificationController.deleteNotification);

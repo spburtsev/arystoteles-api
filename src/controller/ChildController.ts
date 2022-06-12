@@ -14,6 +14,7 @@ const accessAttributes = [
   'birthWeightSecondary',
   'currentWeightPrimary',
   'currentWeightSecondary',
+  'gender',
 ];
 
 const attachChildRelation = async (
