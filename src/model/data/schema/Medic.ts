@@ -15,11 +15,6 @@ const MedicSchema = new Schema({
     required: false,
     default: '',
   },
-  isConfirmed: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
 
   user: {
     type: Schema.Types.ObjectId,
@@ -29,6 +24,10 @@ const MedicSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Organization',
   },
+});
+
+MedicSchema.virtual('isConfirmed').get(function() {
+  return !!this.organization;
 });
 
 const Medic: Model<IMedic> = model('Medic', MedicSchema);

@@ -11,7 +11,6 @@ interface INotification extends Document {
   read: boolean;
   createdAt: Date;
   updatedAt?: Date;
-  archived: boolean;
 }
 
 const NotificationSchema = new Schema({
@@ -22,7 +21,6 @@ const NotificationSchema = new Schema({
   read: { type: Boolean, required: false, default: false },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: false },
-  archived: { type: Boolean, required: false, default: false },
 });
 
 const Notification: Model<INotification> = model(

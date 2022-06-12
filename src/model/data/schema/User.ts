@@ -24,6 +24,8 @@ export interface IUser extends Document {
   passwordResetToken: string;
   passwordResetExpires: Date;
 
+  fullName: string;
+
   comparePasswords: (
     candidatePassword: string,
     userPassword: string,
@@ -80,6 +82,10 @@ const UserSchema = new Schema<IUser>({
   passwordResetExpires: { type: Date },
   role: { type: String, required: true, enum: Object.values(UserRole) },
   isActive: { type: Boolean, default: true, select: false },
+});
+
+UserSchema.virtual('fullName').get(function(this: IUser) {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 UserSchema.pre<IUser>('save', async function(next) {

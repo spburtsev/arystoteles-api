@@ -10,6 +10,7 @@ import AppLocale from '../../enum/AppLocale';
 export interface IScreening extends Document {
   questions: Array<IQuestion>;
   answers: Array<number>;
+  // TODO: change to relations: Array<IChildRelation>;
   child: IChild;
   caregiver: ICaregiver;
   createdAt: Date;
