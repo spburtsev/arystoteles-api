@@ -212,7 +212,7 @@ namespace AuthController {
     const user = await User.findById(req.user.id).select('+password');
 
     if (
-      !(await user.comparePasswords(req.body.passwordCurrent, user.password))
+      !(await user.comparePasswords(req.body.currentPassword, user.password))
     ) {
       return next(new AppError('Your current password is wrong.', 401));
     }

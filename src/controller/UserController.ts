@@ -57,10 +57,22 @@ namespace UserController {
     }
 
     const filteredBody: {
-      name?: string;
+      firstName?: string;
+      lastName?: string;
       email?: string;
       photo?: string;
-    } = _.pick(req.body, 'name', 'email');
+      country?: string;
+      city?: string;
+      preferredLocale?: string;
+    } = _.pick(
+      req.body,
+      'firstName',
+      'email',
+      'lastName',
+      'country',
+      'city',
+      'preferredLocale',
+    );
     if (req.file) {
       filteredBody.photo = req.file.filename;
     }
