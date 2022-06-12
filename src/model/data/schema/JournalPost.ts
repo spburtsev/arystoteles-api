@@ -1,6 +1,5 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import { IChild } from './Child';
-import { ICaregiver } from './Caregiver';
+import { IChildRelation } from './ChildRelation';
 import ChildFeeling from '../../../model/enum/ChildFeeling';
 
 export interface IJournalPost extends Document {
@@ -8,8 +7,7 @@ export interface IJournalPost extends Document {
   childFeeling: ChildFeeling;
   private: boolean;
   notifyMedic: boolean;
-  child: IChild;
-  caregiver: ICaregiver;
+  relation: IChildRelation;
 }
 
 const JournalPostSchema = new Schema({
@@ -22,8 +20,7 @@ const JournalPostSchema = new Schema({
   private: { type: Boolean, required: false, default: false },
   notifyMedic: { type: Boolean, required: false, default: false },
 
-  child: { type: Schema.Types.ObjectId, ref: 'Child' },
-  caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver' },
+  relation: { type: Schema.Types.ObjectId, ref: 'ChildRelation' },
 });
 
 const JournalPost: Model<IJournalPost> = model(
