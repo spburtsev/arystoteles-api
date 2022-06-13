@@ -8,6 +8,7 @@ import { monthsPassed } from '../../../lib/helpers/month-difference';
 import AgeGroup, { matchAgeGroup } from '../../enum/AgeGroup';
 import Gender from '../../enum/Gender';
 import { IMedic } from './Medic';
+import { IDevice } from './Device';
 
 export interface IChild extends Document {
   firstName: string;
@@ -22,6 +23,7 @@ export interface IChild extends Document {
   dailyActivities: Array<IDailyActivity>;
   ageGroup: AgeGroup;
   screenings: Array<IScreening>;
+  devices: Array<IDevice>;
   gender: Gender;
 
   getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
@@ -62,6 +64,7 @@ const ChildSchema = new Schema({
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
   dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],
   screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
+  devices: [{ type: Schema.Types.ObjectId, ref: 'Device' }],
 });
 
 ChildSchema.virtual('ageGroup').get(function(this: IChild) {
