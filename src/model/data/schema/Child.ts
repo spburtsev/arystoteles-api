@@ -7,6 +7,7 @@ import Question, { IQuestion } from './Question';
 import { monthsPassed } from '../../../lib/helpers/month-difference';
 import AgeGroup, { matchAgeGroup } from '../../enum/AgeGroup';
 import Gender from '../../enum/Gender';
+import { IMedic } from './Medic';
 
 export interface IChild extends Document {
   firstName: string;
@@ -15,6 +16,7 @@ export interface IChild extends Document {
   birthWeightSecondary: number;
   currentWeightPrimary?: number;
   currentWeightSecondary?: number;
+  medic?: IMedic;
   relations: Array<IChildRelation>;
   journalPosts: Array<IJournalPost>;
   dailyActivities: Array<IDailyActivity>;
@@ -55,6 +57,7 @@ const ChildSchema = new Schema({
     enum: Object.values(Gender),
     required: true,
   },
+  medic: { type: Schema.Types.ObjectId, ref: 'Medic' },
   relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
   dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],

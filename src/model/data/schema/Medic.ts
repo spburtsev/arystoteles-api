@@ -1,12 +1,15 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
 import { IOrganization } from './Organization';
+import { IChild } from './Child';
 
 export interface IMedic extends Document {
   title: string;
-  isConfirmed: boolean;
   user: IUser;
   organization: IOrganization;
+  children: Array<IChild>;
+
+  isConfirmed: boolean;
 }
 
 const MedicSchema = new Schema({
@@ -15,7 +18,6 @@ const MedicSchema = new Schema({
     required: false,
     default: '',
   },
-
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -23,6 +25,10 @@ const MedicSchema = new Schema({
   organization: {
     type: Schema.Types.ObjectId,
     ref: 'Organization',
+  },
+  children: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Child',
   },
 });
 
