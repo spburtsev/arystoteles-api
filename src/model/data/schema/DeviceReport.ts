@@ -4,14 +4,14 @@ import _LocalizedString from './types/_LocalizedString';
 import LocalizedString from '../LocalizedString';
 
 export interface IDeviceReport extends Document {
-  cratedAt: Date;
+  createdAt: Date;
   device: IDevice;
   message: LocalizedString;
   data: string;
 }
 
 const DeviceReportSchema = new Schema({
-  cratedAt: { type: Date, required: true },
+  createdAt: { type: Date, required: true },
   device: { type: Schema.Types.ObjectId, ref: 'Device' },
   message: { type: _LocalizedString, required: true },
   data: { type: String, required: false },
