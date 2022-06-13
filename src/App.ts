@@ -20,6 +20,7 @@ import tipRouter from './router/tip-router';
 import dailyActivityRouter from './router/daily-activity-router';
 import medicRouter from './router/medic-router';
 import journalPostRouter from './router/journal-post-router';
+import deviceRouter from './router/device-router';
 
 namespace App {
   export const create = () => {
@@ -60,6 +61,7 @@ namespace App {
     app.use('/api/v1/daily-activities', dailyActivityRouter);
     app.use('/api/v1/medics', medicRouter);
     app.use('/api/v1/journal-posts', journalPostRouter);
+    app.use('/api/v1/devices', deviceRouter);
 
     app.all('*', (req, _res, next) => {
       next(new AppError(`Route ${req.originalUrl} not found.`, 404));
