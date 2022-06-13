@@ -6,7 +6,7 @@ class ExtensionService<QueryResultT, DocT> {
   dbQuery: Query<QueryResultT, DocT> | Query<DocT[], DocT, {}, DocT>;
   requestQuery: RequestQuery;
 
-  constructor(dbQuery: Query<QueryResultT, DocT>, requestQuery: RequestQuery) {
+  public constructor(dbQuery: Query<QueryResultT, DocT>, requestQuery: RequestQuery) {
     this.dbQuery = dbQuery;
     this.requestQuery = requestQuery;
   }
