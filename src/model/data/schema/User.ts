@@ -3,8 +3,6 @@ import UserRole from '../../enum/UserRole';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-
-import Organization from './Organization';
 import Caregiver from './Caregiver';
 import Medic from './Medic';
 import AppLocale from '../../enum/AppLocale';
