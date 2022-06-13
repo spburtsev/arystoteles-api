@@ -11,4 +11,7 @@ router
   .patch(DeviceController.updateDevice)
   .delete(DeviceController.deleteDevice);
 
+router.route('/:id/reports').get(DeviceController.getReports);
+router.route('/:id/reports').post(DeviceController.createReport);
+
 export default router;
