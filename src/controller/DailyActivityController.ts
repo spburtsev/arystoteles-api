@@ -5,7 +5,7 @@ import DailyActivity, {
 import Activity from '../model/data/schema/Activity';
 import AppError from '../model/error/AppError';
 import Child from '../model/data/schema/Child';
-import Caregiver from '../model/data/schema/Caregiver';
+import User from '../model/data/schema/User';
 
 const populateDailyActivities = async (childId: string) => {
   const child = await Child.findById(childId);
@@ -53,14 +53,13 @@ namespace DailyActivityController {
       dailyActivities = await populateDailyActivities(childId);
     }
     const date = dailyActivities[0].date;
-    const child = dailyActivities[0].child;
 
     const mappedActivities = dailyActivities.map(activity =>
-      activity.transform(req.locale),
+      activity.localized(req.locale),
     );
     res.status(200).json({
       date,
-      childId: child,
+      childId,
       total: mappedActivities.length,
       activities: mappedActivities,
     });
@@ -82,7 +81,7 @@ namespace DailyActivityController {
     if (!dailyActivity) {
       return next(new AppError('Daily activity not found', 404));
     }
-    const caregiver = await Caregiver.findOne({ user: req.user.id });
+    const caregiver = await User.findById(req.user.id);
     if (!caregiver) {
       return next(new AppError('You are not a caregiver', 403));
     }

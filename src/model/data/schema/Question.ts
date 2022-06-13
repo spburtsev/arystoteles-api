@@ -7,12 +7,15 @@ import Expectation from '../Expectation';
 import QuestionCategory from '../../enum/QuestionCategory';
 import AppLocale from '../../enum/AppLocale';
 import LocalizedString from '../LocalizedString';
+import { IScreening } from './Screening';
 
 export interface IQuestion extends Document {
   text: LocalizedString;
   options: Array<Option>;
   expectations: Array<Expectation>;
   category: QuestionCategory;
+
+  screenings: Array<IScreening>;
 
   localized: (locale: AppLocale) => any;
 }
@@ -22,6 +25,7 @@ const QuestionSchema = new Schema({
   options: [{ type: _Option }],
   expectations: [{ type: _Expectation }],
   category: { type: String, enum: Object.values(QuestionCategory) },
+  screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
 });
 
 QuestionSchema.methods.localized = function(locale: AppLocale) {

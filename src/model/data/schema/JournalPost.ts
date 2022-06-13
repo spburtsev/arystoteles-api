@@ -1,6 +1,6 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IChildRelation } from './ChildRelation';
-import ChildFeeling from '../../../model/enum/ChildFeeling';
+import ChildFeeling from '../../enum/ChildFeeling';
 
 export interface IJournalPost extends Document {
   text: string;
@@ -13,8 +13,9 @@ export interface IJournalPost extends Document {
 const JournalPostSchema = new Schema({
   text: { type: String, required: true },
   childFeeling: {
-    type: ChildFeeling,
+    type: String,
     required: false,
+    enum: Object.values(ChildFeeling),
     default: ChildFeeling.Neutral,
   },
   private: { type: Boolean, required: false, default: false },

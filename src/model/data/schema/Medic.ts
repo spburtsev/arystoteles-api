@@ -2,6 +2,7 @@ import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
 import { IOrganization } from './Organization';
 import { IChild } from './Child';
+import UserRole from '../../enum/UserRole';
 
 export interface IMedic extends Document {
   title: string;
@@ -21,6 +22,10 @@ const MedicSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
+    validate: {
+      validator: (usr: IUser) => usr.role === UserRole.Medic,
+    },
   },
   organization: {
     type: Schema.Types.ObjectId,

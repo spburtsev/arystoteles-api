@@ -4,20 +4,23 @@ import catchAsync from '../lib/helpers/catch-async';
 import AppError from '../model/error/AppError';
 import Child, { IChild } from '../model/data/schema/Child';
 import monthDifference from '../lib/helpers/month-difference';
-import Caregiver, { ICaregiver } from '../model/data/schema/Caregiver';
+import User, { IUser } from '../model/data/schema/User';
+import ChildRelation, {
+  IChildRelation,
+} from '../model/data/schema/ChildRelation';
 
-const createNewScreening = async (child: IChild, caregiver: ICaregiver) => {
-  const questions = await child.getScreeningQuestions();
+const createNewScreening = async (rel: IChildRelation) => {
+  const questions = await rel.child.getScreeningQuestions();
   const screening = new Screening({
     questions,
-    child: child._id,
-    caregiver: caregiver._id,
+    child: rel.child,
+    caregiver: rel.caregiver,
     answers: [],
     createdAt: new Date(),
   });
   const savedScreening = await screening.save();
-  child.screenings.push(savedScreening);
-  await child.save();
+  rel.child.screenings.push(savedScreening);
+  await rel.child.save();
   return savedScreening;
 };
 
@@ -34,15 +37,15 @@ namespace ScreeningController {
     if (!child) {
       return next(new AppError('Child not found', 404));
     }
-    const caregiver = await Caregiver.findOne({
-      user: req.user.id,
-    });
+    const caregiver = await User.findById(req.user.id).populate(
+      'childRelations',
+    );
     if (!caregiver) {
       return next(new AppError('Caregiver not found', 404));
     }
     const screenings = await Screening.find({
       child: childId,
-      caregiver: caregiver._id,
+      caregiver: caregiver,
     })
       .populate('questions')
       .sort({ createdAt: 'desc' })
@@ -62,11 +65,21 @@ namespace ScreeningController {
    */
   export const getMonthlyScreening = catchAsync(async (req, res, next) => {
     const { childId } = req.params;
-    const child = await Child.findById(childId);
-    if (!child) {
+    const caregiver = await User.findById(req.user.id).populate({
+      path: 'childRelations',
+      populate: { path: 'child' },
+    });
+    if (!caregiver) {
+      return next(new AppError('Caregiver not found', 404));
+    }
+    const relation = caregiver.childRelations.find(
+      rel => rel.child._id === childId,
+    );
+    if (!relation) {
       return next(new AppError('Child not found', 404));
     }
-    const caregiver = await Caregiver.findOne({ user: req.user.id });
+    const child = relation.child;
+
     const currentDate = new Date();
     let screening: IScreening;
     let screenings = await Screening.find({
@@ -88,7 +101,7 @@ namespace ScreeningController {
         );
       }
     }
-    screening = await createNewScreening(child, caregiver);
+    screening = await createNewScreening(relation);
 
     res.status(200).json({ screening: screening.localized(req.locale) });
   });
@@ -105,7 +118,14 @@ namespace ScreeningController {
   export const modifyScreening = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const screening = await Screening.findById(id)
-      .populate('caregiver questions child')
+      .populate([
+        { path: 'relation', populate: { path: 'child' } },
+        { path: 'questions' },
+        {
+          path: 'relation',
+          populate: { path: 'user' },
+        },
+      ])
       .exec();
 
     if (!screening) {

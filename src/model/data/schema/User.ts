@@ -3,9 +3,9 @@ import UserRole from '../../enum/UserRole';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import Caregiver from './Caregiver';
 import Medic from './Medic';
 import AppLocale from '../../enum/AppLocale';
+import ChildRelation, { IChildRelation } from './ChildRelation';
 
 export interface IUser extends Document {
   email: string;
@@ -18,6 +18,8 @@ export interface IUser extends Document {
   city?: string;
   preferredLocale?: AppLocale;
 
+  childRelations?: Array<IChildRelation>;
+
   passwordChangedAt: Date;
   passwordResetToken: string;
   passwordResetExpires: Date;
@@ -29,7 +31,7 @@ export interface IUser extends Document {
     userPassword: string,
   ) => Promise<boolean>;
 
-  changedPasswordAfter: (JwtTimestamp: Number) => boolean;
+  changedPasswordAfter: (jwtTimestamp: Number) => boolean;
 
   createPasswordResetToken: () => string;
 
@@ -79,6 +81,9 @@ const UserSchema = new Schema<IUser>({
   passwordResetToken: { type: String },
   passwordResetExpires: { type: Date },
   role: { type: String, required: true, enum: Object.values(UserRole) },
+  childRelations: [
+    { type: Schema.Types.ObjectId, ref: 'ChildRelation', required: false },
+  ],
   isActive: { type: Boolean, default: true, select: false },
 });
 
@@ -98,23 +103,6 @@ UserSchema.pre<IUser>('save', function(next) {
     return next();
   }
   this.passwordChangedAt = new Date(Date.now() - 1000);
-  next();
-});
-
-UserSchema.post<IUser>('save', async function(doc, next) {
-  if (doc.role === UserRole.Caregiver) {
-    await Caregiver.create({
-      user: doc._id,
-    });
-    return next();
-  }
-  if (doc.role === UserRole.Medic) {
-    await Medic.create({
-      user: doc._id,
-    });
-    return next();
-  }
-
   next();
 });
 

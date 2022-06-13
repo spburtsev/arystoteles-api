@@ -1,12 +1,15 @@
 import { Model, Schema, Document, model } from 'mongoose';
-import ChildRelationType from '../../../model/enum/ChildRelationType';
+import ChildRelationType from '../../enum/ChildRelationType';
+import UserRole from '../../enum/UserRole';
 import { IChild } from './Child';
 import { IUser } from './User';
+import { IJournalPost } from './JournalPost';
 
 export interface IChildRelation extends Document {
   relationType: ChildRelationType;
   child: IChild;
-  user: IUser;
+  caregiver: IUser;
+  journalPosts: Array<IJournalPost>;
 }
 
 const ChildRelationSchema = new Schema({
@@ -16,7 +19,12 @@ const ChildRelationSchema = new Schema({
     enum: Object.values(ChildRelationType),
   },
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  caregiver: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    validate: { validator: (usr: IUser) => usr.role === UserRole.Caregiver },
+  },
+  journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
 });
 
 const ChildRelation: Model<IChildRelation> = model(

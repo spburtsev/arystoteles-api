@@ -10,7 +10,6 @@ import errorMiddleware from './middleware/error-middleware';
 import localeMiddleware from './middleware/locale-middleware';
 import userRouter from './router/user-router';
 import backupRouter from './router/backup-router';
-import caregiverRouter from './router/caregiver-router';
 import organizationRouter from './router/organization-router';
 import activityRouter from './router/activity-router';
 import childRouter from './router/child-router';
@@ -51,7 +50,6 @@ namespace App {
     app.use(localeMiddleware);
     app.use('/api/v1/users', userRouter);
     app.use('/api/v1/backups', backupRouter);
-    app.use('/api/v1/caregivers', caregiverRouter);
     app.use('/api/v1/organizations', organizationRouter);
     app.use('/api/v1/activities', activityRouter);
     app.use('/api/v1/children', childRouter);

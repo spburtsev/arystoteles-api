@@ -8,6 +8,8 @@ const router = express.Router();
 router.use(AuthController.protect);
 
 router.post('/', JournalPostController.addJournalPost);
+router.route('/by-child/:childId').get(JournalPostController.getForChild);
+
 router.get('/', JournalPostController.getAllJournalPosts);
 router
   .route('/:id')

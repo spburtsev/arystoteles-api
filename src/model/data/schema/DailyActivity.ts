@@ -1,33 +1,33 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IActivity } from './Activity';
 import { IChild } from './Child';
-import { ICaregiver } from './Caregiver';
+import { IUser } from './User';
 import AppLocale from '../../enum/AppLocale';
 
 export interface IDailyActivity extends Document {
   activity: IActivity;
   date: Date;
   child: IChild;
-  caregiver?: ICaregiver;
+  caregiver?: IUser;
   isCompleted: boolean;
 
-  transform: (locale: AppLocale) => any;
+  localized: (locale: AppLocale) => any;
 
-  complete: (value: boolean, caregiver: ICaregiver) => void;
+  complete: (value: boolean, caregiver: IUser) => void;
 }
 
 const DailyActivitySchema = new Schema({
   activity: { type: Schema.Types.ObjectId, ref: 'Activity' },
   date: { type: Date, required: true },
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
-  caregiver: { type: Schema.Types.ObjectId, ref: 'Caregiver', required: false },
+  caregiver: { type: Schema.Types.ObjectId, ref: 'User', required: false },
 });
 
 DailyActivitySchema.virtual('isCompleted').get(function() {
   return !!this.caregiver;
 });
 
-DailyActivitySchema.methods.transform = function(locale: AppLocale) {
+DailyActivitySchema.methods.localized = function(locale: AppLocale) {
   return {
     id: this._id,
     activity: this.activity.localized(locale),
@@ -37,7 +37,7 @@ DailyActivitySchema.methods.transform = function(locale: AppLocale) {
 
 DailyActivitySchema.methods.complete = function(
   value: boolean,
-  caregiver: ICaregiver,
+  caregiver: IUser,
 ) {
   if (value === this.isCompleted) {
     throw new Error('DailyActivity is already completed');

@@ -1,6 +1,7 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
 import { IMedic } from './Medic';
+import UserRole from '../../enum/UserRole';
 
 export interface IOrganization extends Document {
   name?: string;
@@ -41,6 +42,11 @@ const OrganizationSchema = new Schema<IOrganization>({
   administrator: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true,
+    validate: {
+      validator: (usr: IUser) =>
+        usr.role === UserRole.OrganizationAdministrator,
+    },
   },
   medics: [{ type: Schema.Types.ObjectId, ref: 'Medic' }],
 });
