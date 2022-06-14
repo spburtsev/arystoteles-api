@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import getDbConnectionString, {
-  getDbUri,
-} from '../lib/helpers/get-db-connection-string';
+import getDbConnectionString from '../lib/helpers/get-db-connection-string';
 import { spawn } from 'child_process';
 import catchAsync from '../lib/helpers/catch-async';
 import BackupMethod from '../model/enum/BackupMethod';
 import RestoreMethod from '../model/enum/RestoreMethod';
 import path from 'path';
 import fs from 'fs/promises';
+import Backup, { IBackup } from '../model/data/schema/Backup';
 
 const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
 
