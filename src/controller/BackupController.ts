@@ -3,7 +3,6 @@ import getDbConnectionString from '../lib/helpers/get-db-connection-string';
 import { spawn } from 'child_process';
 import catchAsync from '../lib/helpers/catch-async';
 import BackupMethod from '../model/enum/BackupMethod';
-import RestoreMethod from '../model/enum/RestoreMethod';
 import path from 'path';
 import fs from 'fs/promises';
 import Backup, { IBackup } from '../model/data/schema/Backup';
@@ -35,8 +34,26 @@ const restore = (fileName: string) => {
 
 const readExistingBackups = async () => {
   const backupPath = path.join(__dirname, '../../backup/');
-  const backups = await fs.readdir(backupPath, 'utf-8');
-  return backups.map(backup => backup.split('.gz')[0]);
+  const backupFiles = await fs.readdir(backupPath, 'utf-8');
+  const backups = await Backup.find({})
+    .populate('createdBy')
+    .exec();
+
+  let validBackups: Array<IBackup> = [];
+  let invalidBackups: Array<IBackup> = [];
+
+  backups.forEach((backup: IBackup) => {
+    if (backupFiles.includes(backup.fileName)) {
+      validBackups.push(backup);
+    } else {
+      invalidBackups.push(backup);
+    }
+  });
+  invalidBackups.forEach(async backup => await backup.remove());
+  return validBackups.map(backup => ({
+    ...backup,
+    fileName: backup.fileName.replace('.gzip', ''),
+  }));
 };
 
 namespace BackupController {
@@ -53,7 +70,7 @@ namespace BackupController {
     const fileName = req.body.fileName || Date.now().toString();
     const dumpProcess = dumpBackup(fileName);
 
-    dumpProcess.on('exit', (code, signal) => {
+    dumpProcess.on('exit', async (code, signal) => {
       if (code) {
         return res.status(500).json({
           message: `Backup process exited with code: ${code}`,
@@ -64,8 +81,17 @@ namespace BackupController {
           message: `Backup process killed with signal: ${signal}`,
         });
       }
+      const backup = new Backup({
+        fileName,
+        method: BackupMethod.Mongodump,
+        createdAt: new Date(),
+        createdBy: req.user.id,
+      });
+      await backup.save();
+
       return res.status(200).json({
         message: 'Backup created successfully',
+        backup,
       });
     });
   };
