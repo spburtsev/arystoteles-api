@@ -11,6 +11,8 @@ const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
 
 const dumpBackup = (fileName: string) => {
   const archivePath = backupPath(fileName);
+  console.log(archivePath);
+
   const uri = getDbConnectionString();
   const proc = spawn('mongodump', [
     `${uri}`,
@@ -36,6 +38,7 @@ const readExistingBackups = async () => {
   const backupPath = path.join(__dirname, '../../backup/');
   const backupFiles = await fs.readdir(backupPath, 'utf-8');
   const backups = await Backup.find({})
+    .sort({ createdAt: 'desc' })
     .populate('createdBy')
     .exec();
 
@@ -43,23 +46,24 @@ const readExistingBackups = async () => {
   let invalidBackups: Array<IBackup> = [];
 
   backups.forEach((backup: IBackup) => {
-    if (backupFiles.includes(backup.fileName)) {
+    if (
+      backupFiles.some(
+        fileName => fileName.split('.gzip')[0] === backup.fileName,
+      )
+    ) {
       validBackups.push(backup);
     } else {
       invalidBackups.push(backup);
     }
   });
   invalidBackups.forEach(async backup => await backup.remove());
-  return validBackups.map(backup => ({
-    ...backup,
-    fileName: backup.fileName.replace('.gzip', ''),
-  }));
+  return validBackups;
 };
 
 namespace BackupController {
   export const getAllBackups = catchAsync(async (req, res, next) => {
     const backups = await readExistingBackups();
-    res.status(200).json({ backups });
+    res.status(200).json({ total: backups.length, backups });
   });
 
   export const createBackup = (
@@ -96,12 +100,14 @@ namespace BackupController {
     });
   };
 
-  export const restoreFromBackup = (
-    req: Request,
-    res: Response,
-    _next: NextFunction,
-  ) => {
-    const restoreProcess = restore(req.params.fileName);
+  export const restoreFromBackup = catchAsync(async (req, res, next) => {
+    const fileName = req.params.fileName;
+    const backup = await Backup.findOne({ fileName });
+
+    const preservedBackups = await Backup.find({
+      createdAt: { $gte: backup.createdAt },
+    }).exec();
+    const restoreProcess = restore(fileName);
     restoreProcess.on('error', error => {
       return res.status(500).json({
         message: error.message,
@@ -119,10 +125,13 @@ namespace BackupController {
           message: `Restore process killed with signal: ${signal}`,
         });
       }
+      preservedBackups.forEach(
+        async backup => await new Backup(backup.preserve()).save(),
+      );
       return res.status(200).json({
         message: 'Successfully restored the database',
       });
     });
-  };
+  });
 }
 export default BackupController;

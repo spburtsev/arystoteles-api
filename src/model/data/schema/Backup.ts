@@ -7,21 +7,20 @@ export interface IBackup extends Document {
   fileName: string;
   createdBy: IUser;
   createdAt: Date;
+  method: BackupMethod;
+  preserve: () => Partial<IBackup>;
 }
 
 const BackupSchema = new Schema({
   fileName: {
     type: String,
     required: true,
+    unique: true,
   },
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    validate: {
-      validator: (usr: IUser) =>
-        usr.role === UserRole.Admin || usr.role === UserRole.Seed,
-    },
   },
   createdAt: {
     type: Date,
@@ -33,6 +32,15 @@ const BackupSchema = new Schema({
     enum: Object.values(BackupMethod),
   },
 });
+
+BackupSchema.methods.preserve = function() {
+  return {
+    fileName: this.fileName,
+    createdBy: this.createdBy,
+    createdAt: this.createdAt,
+    method: this.method,
+  };
+};
 
 const Backup: Model<IBackup> = model('Backup', BackupSchema);
 export default Backup;
