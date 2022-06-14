@@ -23,9 +23,6 @@ const MedicSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    validate: {
-      validator: (usr: IUser) => usr.role === UserRole.Medic,
-    },
   },
   organization: {
     type: Schema.Types.ObjectId,

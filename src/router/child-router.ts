@@ -6,6 +6,9 @@ const router = express.Router();
 
 router.use(AuthController.protect);
 
+router.route('/tips/:id').get(ChildController.getTips);
+router.route('/related').get(ChildController.getRelatedChildren);
+
 router
   .route('/')
   .get(ChildController.getAllChildren)
@@ -16,8 +19,5 @@ router
   .get(ChildController.getChild)
   .patch(ChildController.updateChild)
   .delete(ChildController.deleteChild);
-
-router.route('/:id/tips').get(ChildController.getTips);
-router.route('/related').get(ChildController.getRelatedChildren);
 
 export default router;

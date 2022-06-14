@@ -73,7 +73,7 @@ namespace ScreeningController {
       return next(new AppError('Caregiver not found', 404));
     }
     const relation = caregiver.childRelations.find(
-      rel => rel.child._id === childId,
+      rel => rel.child._id.toString() === childId,
     );
     if (!relation) {
       return next(new AppError('Child not found', 404));

@@ -1,6 +1,5 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import ChildRelationType from '../../enum/ChildRelationType';
-import UserRole from '../../enum/UserRole';
 import { IChild } from './Child';
 import { IUser } from './User';
 import { IJournalPost } from './JournalPost';
@@ -22,7 +21,6 @@ const ChildRelationSchema = new Schema({
   caregiver: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    validate: { validator: (usr: IUser) => usr.role === UserRole.Caregiver },
   },
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
 });

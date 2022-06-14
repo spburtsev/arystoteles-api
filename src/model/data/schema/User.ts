@@ -17,28 +17,22 @@ export interface IUser extends Document {
   country: string;
   city?: string;
   preferredLocale?: AppLocale;
-
   childRelations?: Array<IChildRelation>;
-
   passwordChangedAt: Date;
   passwordResetToken: string;
   passwordResetExpires: Date;
-
   fullName: string;
-
   comparePasswords: (
     candidatePassword: string,
     userPassword: string,
   ) => Promise<boolean>;
-
   changedPasswordAfter: (jwtTimestamp: Number) => boolean;
-
   createPasswordResetToken: () => string;
-
   secured(): Omit<
     IUser,
     'password' | 'passwordResetToken' | 'passwordResetExpires'
   >;
+  findRelation: (childId: string) => IChildRelation | undefined;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -145,6 +139,12 @@ UserSchema.methods.secured = function(this: IUser) {
     ...user
   } = this.toObject();
   return user;
+};
+
+UserSchema.methods.findRelation = function(childId: string) {
+  return this.childRelations.find(
+    (relation: IChildRelation) => relation.child._id.toString() === childId,
+  );
 };
 
 const User: Model<IUser> = model('User', UserSchema);

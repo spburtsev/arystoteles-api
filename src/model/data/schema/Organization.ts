@@ -43,10 +43,6 @@ const OrganizationSchema = new Schema<IOrganization>({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    validate: {
-      validator: (usr: IUser) =>
-        usr.role === UserRole.OrganizationAdministrator,
-    },
   },
   medics: [{ type: Schema.Types.ObjectId, ref: 'Medic' }],
 });

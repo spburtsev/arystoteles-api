@@ -23,37 +23,42 @@ const accessAttributes = [
 const attach = (user: IUser) => (child: IChild) => async (
   relationType: ChildRelationType,
 ) => {
-  ChildRelation.create({
-    user,
+  const rel = await ChildRelation.create({
     child,
     relationType,
-  }).then(rel => {
-    user.update({
-      $push: {
-        childRelations: rel,
-      },
-    });
-    child.update({
-      $push: {
-        relations: rel,
-      },
-    });
+    caregiver: user,
   });
+  await user
+    .update({
+      $push: {
+        childRelations: rel._id,
+      },
+    })
+    .exec();
+  await child
+    .update({
+      $push: {
+        relations: rel._id,
+      },
+    })
+    .exec();
 };
 
-const findCaregiver = async (userId: string) =>
+const findCaregiver = (userId: string) =>
   User.findById(userId)
-    .where('role', UserRole.Caregiver)
     .populate({
       path: 'childRelations',
       populate: { path: 'child' },
-    });
+    })
+    .exec();
 
-const findChild = async (childId: string) =>
-  Child.findById(childId).populate({
-    path: 'relations',
-    populate: { path: 'caregiver' },
-  });
+const findChild = (childId: string) =>
+  Child.findById(childId)
+    .populate({
+      path: 'relations',
+      populate: { path: 'caregiver' },
+    })
+    .exec();
 
 namespace ChildController {
   export const createChild = catchAsync(async (req, res, next) => {
@@ -141,10 +146,13 @@ namespace ChildController {
       );
     }
     const childAttributes = _.pick(req.body, accessAttributes) as IChild;
-    await child.update(childAttributes);
+    const updated = await Child.findByIdAndUpdate(child._id, childAttributes, {
+      new: true,
+      runValidators: true,
+    });
     res.status(200).json({
       status: 'success',
-      child,
+      child: updated,
     });
   });
 

@@ -111,7 +111,8 @@ ChildSchema.methods.getScreeningQuestions = async function() {
 
 ChildSchema.methods.isRelatedTo = function(caregiverId: string) {
   return this.relations.some(
-    (relation: IChildRelation) => relation.caregiver._id === caregiverId,
+    (relation: IChildRelation) =>
+      relation.caregiver._id.toString() === caregiverId,
   );
 };
 

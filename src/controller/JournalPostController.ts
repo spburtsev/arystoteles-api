@@ -13,9 +13,7 @@ namespace JournalPostController {
       return next(new Error('No caregiver found'));
     }
     const { childId, ...post } = req.body;
-    const relation = caregiver.childRelations.find(
-      relation => relation.child._id === childId,
-    );
+    const relation = caregiver.findRelation(childId);
     if (!relation) {
       return next(new Error('No relation found'));
     }
@@ -36,7 +34,7 @@ namespace JournalPostController {
     if (!usr) {
       return next(new Error('No caregiver found'));
     }
-    const relation = usr.childRelations.find(rel => rel.child._id === childId);
+    const relation = usr.findRelation(childId);
     if (!relation) {
       return next(new Error('No relation found'));
     }
