@@ -110,10 +110,8 @@ namespace ChildController {
     }));
     res.status(200).json({
       status: 'success',
-      data: {
-        total: children.length,
-        children,
-      },
+      total: children.length,
+      children,
     });
   });
 

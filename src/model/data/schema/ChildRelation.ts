@@ -3,12 +3,14 @@ import ChildRelationType from '../../enum/ChildRelationType';
 import { IChild } from './Child';
 import { IUser } from './User';
 import { IJournalPost } from './JournalPost';
+import { IScreening } from './Screening';
 
 export interface IChildRelation extends Document {
   relationType: ChildRelationType;
   child: IChild;
   caregiver: IUser;
   journalPosts: Array<IJournalPost>;
+  screenings: Array<IScreening>;
 }
 
 const ChildRelationSchema = new Schema({
@@ -23,6 +25,7 @@ const ChildRelationSchema = new Schema({
     ref: 'User',
   },
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
+  screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
 });
 
 const ChildRelation: Model<IChildRelation> = model(

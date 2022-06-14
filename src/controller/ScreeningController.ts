@@ -72,9 +72,7 @@ namespace ScreeningController {
     if (!caregiver) {
       return next(new AppError('Caregiver not found', 404));
     }
-    const relation = caregiver.childRelations.find(
-      rel => rel.child._id.toString() === childId,
-    );
+    const relation = caregiver.findRelation(childId);
     if (!relation) {
       return next(new AppError('Child not found', 404));
     }
@@ -83,10 +81,13 @@ namespace ScreeningController {
     const currentDate = new Date();
     let screening: IScreening;
     let screenings = await Screening.find({
-      child: childId,
-      caregiver: caregiver._id,
+      relation: relation._id,
     })
       .sort({ createdAt: 'desc' })
+      .populate({
+        path: 'relation',
+        populate: { path: 'child' },
+      })
       .exec();
 
     if (screenings.length !== 0) {

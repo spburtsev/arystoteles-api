@@ -22,7 +22,6 @@ export interface IChild extends Document {
   journalPosts: Array<IJournalPost>;
   dailyActivities: Array<IDailyActivity>;
   ageGroup: AgeGroup;
-  screenings: Array<IScreening>;
   devices: Array<IDevice>;
   gender: Gender;
 
@@ -61,7 +60,6 @@ const ChildSchema = new Schema({
     required: true,
   },
   medic: { type: Schema.Types.ObjectId, ref: 'Medic' },
-  relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
   dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],
   screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
