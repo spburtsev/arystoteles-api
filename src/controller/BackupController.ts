@@ -11,8 +11,8 @@ import fs from 'fs/promises';
 
 const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
 
-const dumpBackup = () => {
-  const archivePath = backupPath(Date.now().toString());
+const dumpBackup = (fileName: string) => {
+  const archivePath = backupPath(fileName);
   const uri = getDbConnectionString();
   const proc = spawn('mongodump', [
     `${uri}`,
@@ -47,11 +47,12 @@ namespace BackupController {
   });
 
   export const createBackup = (
-    _req: Request,
+    req: Request,
     res: Response,
     _next: NextFunction,
   ) => {
-    const dumpProcess = dumpBackup();
+    const fileName = req.body.fileName || Date.now().toString();
+    const dumpProcess = dumpBackup(fileName);
 
     dumpProcess.on('exit', (code, signal) => {
       if (code) {

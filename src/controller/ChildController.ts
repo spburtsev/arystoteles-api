@@ -17,6 +17,7 @@ const accessAttributes = [
   'currentWeightPrimary',
   'currentWeightSecondary',
   'gender',
+  'medic',
 ];
 
 const attach = (user: IUser) => (child: IChild) => async (
@@ -129,8 +130,40 @@ namespace ChildController {
     });
   });
 
+  export const updateChild = catchAsync(async (req, res, next) => {
+    const child = await findChild(req.params.id);
+    if (!child) {
+      return next(new AppError('Child not found', 404));
+    }
+    if (!child.isRelatedTo(req.user.id)) {
+      return next(
+        new AppError('You are not authorized to access this child', 403),
+      );
+    }
+    const childAttributes = _.pick(req.body, accessAttributes) as IChild;
+    await child.update(childAttributes);
+    res.status(200).json({
+      status: 'success',
+      child,
+    });
+  });
+
+  export const deleteChild = catchAsync(async (req, res, next) => {
+    const child = await findChild(req.params.id);
+    if (!child) {
+      return next(new AppError('Child not found', 404));
+    }
+    if (!child.isRelatedTo(req.user.id)) {
+      return next(
+        new AppError('You are not authorized to access this child', 403),
+      );
+    }
+    await child.remove();
+    res.status(200).json({
+      status: 'success',
+    });
+  });
+
   export const getAllChildren = CrudFactory.getAll(Child);
-  export const updateChild = CrudFactory.updateOne(Child);
-  export const deleteChild = CrudFactory.deleteOne(Child);
 }
 export default ChildController;
