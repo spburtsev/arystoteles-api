@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import pug from 'pug';
 import { htmlToText } from 'html-to-text';
+import AppLocale from '../../model/enum/AppLocale';
 
 class EmailService {
   to: string;
@@ -14,7 +15,7 @@ class EmailService {
     this.from = `Arystoteles <${process.env.EMAIL_FROM}>`;
   }
 
-  newTransport() {
+  public newTransport() {
     if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
         service: 'SendGrid',
@@ -35,7 +36,7 @@ class EmailService {
     });
   }
 
-  async send(template: string, subject: string) {
+  public async send(template: string, subject: string) {
     const html = pug.renderFile(
       `${__dirname}/../../static/email/${template}.pug`,
       {
