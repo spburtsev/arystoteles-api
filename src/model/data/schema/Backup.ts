@@ -1,6 +1,7 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
 import UserRole from '../../enum/UserRole';
+import BackupMethod from '../../enum/BackupMethod';
 
 export interface IBackup extends Document {
   fileName: string;
@@ -25,6 +26,11 @@ const BackupSchema = new Schema({
   createdAt: {
     type: Date,
     required: true,
+  },
+  method: {
+    type: String,
+    required: true,
+    enum: Object.values(BackupMethod),
   },
 });
 
