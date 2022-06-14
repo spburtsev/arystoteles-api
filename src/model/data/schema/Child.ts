@@ -26,6 +26,7 @@ export interface IChild extends Document {
   devices: Array<IDevice>;
   gender: Gender;
 
+  isRelatedTo: (caregiverId: string) => boolean;
   getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
 }
 
@@ -106,6 +107,12 @@ ChildSchema.methods.getScreeningQuestions = async function() {
   }).exec();
 
   return relevantQuestions;
+};
+
+ChildSchema.methods.isRelatedTo = function(caregiverId: string) {
+  return this.relations.some(
+    (relation: IChildRelation) => relation.caregiver._id === caregiverId,
+  );
 };
 
 const Child: Model<IChild> = model('Child', ChildSchema);

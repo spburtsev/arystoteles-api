@@ -91,8 +91,7 @@ namespace ScreeningController {
 
     if (screenings.length !== 0) {
       const lastScreening = screenings[0];
-      const monthsSinceLastScreening = monthDifference(
-        lastScreening.createdAt,
+      const monthsSinceLastScreening = monthDifference(lastScreening.createdAt)(
         currentDate,
       );
       if (monthsSinceLastScreening < 1) {

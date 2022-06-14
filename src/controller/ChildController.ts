@@ -5,6 +5,7 @@ import UserRole from '../model/enum/UserRole';
 import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
 import Child, { IChild } from '../model/data/schema/Child';
+import Tip from '../model/data/schema/Tip';
 import User, { IUser } from '../model/data/schema/User';
 import CrudFactory from './factory/CrudFactory';
 
@@ -39,14 +40,23 @@ const attach = (user: IUser) => (child: IChild) => async (
   });
 };
 
+const findCaregiver = async (userId: string) =>
+  User.findById(userId)
+    .where('role', UserRole.Caregiver)
+    .populate({
+      path: 'childRelations',
+      populate: { path: 'child' },
+    });
+
+const findChild = async (childId: string) =>
+  Child.findById(childId).populate({
+    path: 'relations',
+    populate: { path: 'caregiver' },
+  });
+
 namespace ChildController {
   export const createChild = catchAsync(async (req, res, next) => {
-    const usr = await User.findById(req.user?.id)
-      .where('role', UserRole.Caregiver)
-      .populate({
-        path: 'childRelations',
-        populate: { path: 'child' },
-      });
+    const usr = await findCaregiver(req.user.id);
     if (!usr) {
       return next(new AppError('Caregiver not found', 404));
     }
@@ -66,14 +76,11 @@ namespace ChildController {
   });
 
   export const getChild = catchAsync(async (req, res, next) => {
-    const child = await Child.findById(req.params.id).populate({
-      path: 'relations',
-      populate: { path: 'user' },
-    });
+    const child = await findChild(req.params.id);
     if (!child) {
       return next(new AppError('Child not found', 404));
     }
-    if (!child.relations.some(x => x.caregiver._id === req.user?.id)) {
+    if (!child.isRelatedTo(req.user.id)) {
       return next(
         new AppError('You are not authorized to access this child', 403),
       );
@@ -87,12 +94,7 @@ namespace ChildController {
   });
 
   export const getRelatedChildren = catchAsync(async (req, res, next) => {
-    const usr = await User.findById(req.user?.id)
-      .where('role', UserRole.Caregiver)
-      .populate({
-        path: 'childRelations',
-        populate: { path: 'child' },
-      });
+    const usr = await findCaregiver(req.user.id);
     if (!usr) {
       return next(new AppError('Caregiver not found', 404));
     }
@@ -106,6 +108,24 @@ namespace ChildController {
         total: children.length,
         children,
       },
+    });
+  });
+
+  export const getTips = catchAsync(async (req, res, next) => {
+    const child = await findChild(req.params.id);
+    if (!child) {
+      return next(new AppError('Child not found', 404));
+    }
+    if (!child.isRelatedTo(req.user.id)) {
+      return next(
+        new AppError('You are not authorized to access this child', 403),
+      );
+    }
+    const tips = await Tip.find({ ageGroups: child.ageGroup });
+    res.status(200).json({
+      status: 'success',
+      total: tips.length,
+      tips,
     });
   });
 
