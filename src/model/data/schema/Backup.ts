@@ -1,13 +1,13 @@
 import { Model, Schema, Document, model } from 'mongoose';
 import { IUser } from './User';
-import UserRole from '../../enum/UserRole';
 import BackupMethod from '../../enum/BackupMethod';
 
 export interface IBackup extends Document {
   fileName: string;
-  createdBy: IUser;
+  createdBy?: IUser;
   createdAt: Date;
   method: BackupMethod;
+  system?: boolean;
   preserve: () => Partial<IBackup>;
 }
 
@@ -20,7 +20,12 @@ const BackupSchema = new Schema({
   createdBy: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false,
+  },
+  system: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
   createdAt: {
     type: Date,
