@@ -27,7 +27,7 @@ DailyActivitySchema.virtual('isCompleted').get(function() {
 
 DailyActivitySchema.methods.localized = function(locale: AppLocale) {
   return {
-    id: this._id,
+    _id: this._id,
     activity: this.activity.localized(locale),
     isCompleted: this.isCompleted,
     completedBy: this.isCompleted ? this.caregiver : null,
