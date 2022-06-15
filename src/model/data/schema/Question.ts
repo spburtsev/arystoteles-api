@@ -14,10 +14,10 @@ export interface IQuestion extends Document {
   options: Array<Option>;
   expectations: Array<Expectation>;
   category: QuestionCategory;
-
   screenings: Array<IScreening>;
-
   localized: (locale: AppLocale) => any;
+  minValue: number;
+  maxValue: number;
 }
 
 const QuestionSchema = new Schema({
@@ -26,6 +26,18 @@ const QuestionSchema = new Schema({
   expectations: [{ type: _Expectation }],
   category: { type: String, enum: Object.values(QuestionCategory) },
   screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
+});
+
+QuestionSchema.virtual('minValue').get(function() {
+  return this.options.reduce((min, option) => {
+    return option.value < min ? option.value : min;
+  }, Infinity);
+});
+
+QuestionSchema.virtual('maxValue').get(function() {
+  return this.options.reduce((max, option) => {
+    return option.value > max ? option.value : max;
+  }, -Infinity);
 });
 
 QuestionSchema.methods.localized = function(locale: AppLocale) {

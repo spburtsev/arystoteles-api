@@ -13,14 +13,13 @@ const createNewScreening = async (rel: IChildRelation) => {
   const questions = await rel.child.getScreeningQuestions();
   const screening = new Screening({
     questions,
-    child: rel.child,
-    caregiver: rel.caregiver,
+    relation: rel,
     answers: [],
     createdAt: new Date(),
   });
   const savedScreening = await screening.save();
-  rel.child.screenings.push(savedScreening);
-  await rel.child.save();
+  rel.screenings.push(savedScreening);
+  await rel.save();
   return savedScreening;
 };
 
@@ -81,7 +80,7 @@ namespace ScreeningController {
     const currentDate = new Date();
     let screening: IScreening;
     let screenings = await Screening.find({
-      relation: relation._id,
+      relation: relation,
     })
       .sort({ createdAt: 'desc' })
       .populate({
@@ -102,6 +101,7 @@ namespace ScreeningController {
       }
     }
     screening = await createNewScreening(relation);
+    console.log('created!');
 
     res.status(200).json({ screening: screening.localized(req.locale) });
   });
@@ -123,7 +123,7 @@ namespace ScreeningController {
         { path: 'questions' },
         {
           path: 'relation',
-          populate: { path: 'user' },
+          populate: { path: 'caregiver' },
         },
       ])
       .exec();
@@ -131,10 +131,20 @@ namespace ScreeningController {
     if (!screening) {
       return next(new AppError('Screening not found', 404));
     }
-    const { answers } = req.body;
+    const { answers }: { answers: any[] } = req.body;
     if (answers.length !== screening.questions.length) {
       return next(new AppError('Invalid number of answers', 400));
     }
+
+    for (let i = 0; i < answers.length; i++) {
+      const question = screening.questions[i];
+      const answerIsValid =
+        answers[i] >= question.minValue && answers[i] <= question.maxValue;
+      if (!answerIsValid) {
+        return next(new AppError(`Invalid answer at index ${i}`, 400));
+      }
+    }
+
     screening.answers = answers;
     screening.updatedAt = new Date();
     screening.estimateResult();

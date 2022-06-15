@@ -13,14 +13,13 @@ export interface IScreening extends Document {
   createdAt: Date;
   updatedAt?: Date;
   result?: ScreeningResult;
-
   localized: (locale: AppLocale) => any;
   estimateResult: () => void;
 }
 
 const ScreeningSchema = new Schema({
   questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
-  answers: [Number],
+  answers: [{ type: Number }],
   relation: { type: Schema.Types.ObjectId, ref: 'ChildRelation' },
   createdAt: { type: Date },
   updatedAt: { type: Date, required: false },
@@ -31,13 +30,15 @@ const ScreeningSchema = new Schema({
   },
 });
 
-ScreeningSchema.methods.estimateResult = async function() {
+ScreeningSchema.methods.estimateResult = async function(this: IScreening) {
   let passedAnswers = 0;
+  const ageGroup = this.relation.child.ageGroup;
   this.questions.forEach((question: IQuestion, index) => {
     const relevantExpectation = question.expectations.find(
-      x => x.ageGroup === this.relation.child.ageGroup,
+      x => x.ageGroup === ageGroup,
     ).value;
-    if (this.options[this.answers[index]] === relevantExpectation) {
+    const relevantOption = question.options[this.answers[index]].value;
+    if (relevantOption === relevantExpectation) {
       ++passedAnswers;
     }
   });
@@ -50,11 +51,10 @@ ScreeningSchema.methods.estimateResult = async function() {
 
 ScreeningSchema.methods.localized = function(locale: AppLocale) {
   return {
-    id: this._id,
+    _id: this._id,
     totalQuestions: this.questions.length,
     questions: this.questions.map(question => question.localized(locale)),
     answers: this.answers,
-    relation: this.relation,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     result: this.result,
