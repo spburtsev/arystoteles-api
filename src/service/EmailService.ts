@@ -36,14 +36,18 @@ class EmailService {
     });
   }
 
-  public async send(template: string, subject: string) {
+  public async send(template: string, subject: string, addOptions?: object) {
+    let renderOptions = {
+      firstName: this.firstName,
+      url: this.url,
+      subject,
+    };
+    if (addOptions) {
+      renderOptions = { ...renderOptions, ...addOptions };
+    }
     const html = pug.renderFile(
-      `${__dirname}/../../static/email/${template}.pug`,
-      {
-        firstName: this.firstName,
-        url: this.url,
-        subject,
-      },
+      `${__dirname}/../static/email/${template}.pug`,
+      renderOptions,
     );
 
     const mailOptions = {
@@ -65,6 +69,13 @@ class EmailService {
       'password-reset',
       'Your password reset token (valid for only 10 minutes)',
     );
+  }
+
+  public async sendFailureReport(file: string, msg: string) {
+    await this.send('failure', 'Failure report', {
+      msg,
+      file,
+    });
   }
 }
 export default EmailService;

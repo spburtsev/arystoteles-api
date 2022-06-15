@@ -26,31 +26,38 @@ import BackupService from './service/BackupService';
 import EmailService from './service/EmailService';
 import BackupMethod from './model/enum/BackupMethod';
 import Backup from './model/data/schema/Backup';
-import cron from 'node-cron';
+import cron, { CronJob } from 'cron';
 
 const setupScheduledJobs = () => {
-  cron.schedule('59 23 * * *', () => {
+  const backupJob = new CronJob('59 23 * * *', () => {
     console.log('---------------------');
     console.log('Running a mongodump Job');
     const fileName = Date.now().toString();
     const proc = BackupService.dumpBackup(fileName);
 
     proc.on('exit', async (code, signal) => {
+      let msg: string;
       if (code) {
-        console.log(
-          `Backup process exited with code: ${code} for backup at ${fileName}`,
+        msg = `Backup process exited with code: ${code} for backup at ${fileName}`;
+        console.log(msg);
+        await new EmailService(process.env.ADMIN_EMAIL, '').sendFailureReport(
+          fileName,
+          msg,
         );
       }
       if (signal) {
-        console.log(
-          `Backup process killed with signal: ${signal} for backup at ${fileName}`,
+        msg = `Backup process killed with signal: ${signal} for backup at ${fileName}`;
+        console.log(msg);
+        await new EmailService(process.env.ADMIN_EMAIL, '').sendFailureReport(
+          fileName,
+          msg,
         );
       }
       const backup = new Backup({
         fileName,
         method: BackupMethod.Mongodump,
         createdAt: new Date(),
-        createdBy: 'system',
+        system: true,
       });
       await backup.save();
 
@@ -58,7 +65,7 @@ const setupScheduledJobs = () => {
     });
     console.log('---------------------');
   });
-
+  backupJob.start();
   console.log('Scheduled jobs were set up');
 };
 
