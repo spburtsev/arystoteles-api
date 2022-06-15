@@ -9,15 +9,13 @@ export interface IMedic extends Document {
   user: IUser;
   organization: IOrganization;
   children: Array<IChild>;
-
   isConfirmed: boolean;
 }
 
 const MedicSchema = new Schema({
   title: {
     type: String,
-    required: false,
-    default: '',
+    required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
@@ -32,10 +30,11 @@ const MedicSchema = new Schema({
     type: [Schema.Types.ObjectId],
     ref: 'Child',
   },
-});
-
-MedicSchema.virtual('isConfirmed').get(function() {
-  return !!this.organization;
+  isConfirmed: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
 
 const Medic: Model<IMedic> = model('Medic', MedicSchema);
