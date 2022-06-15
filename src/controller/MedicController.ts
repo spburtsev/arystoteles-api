@@ -7,6 +7,7 @@ import _ from 'lodash';
 import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
 import CrudFactory from './factory/CrudFactory';
+import Organization from 'src/model/data/schema/Organization';
 
 namespace MedicController {
   export const getSelf = catchAsync(async (req, res, next) => {
@@ -75,8 +76,10 @@ namespace MedicController {
     if (!medic) {
       return next(new AppError('Medic not found', 404));
     }
-    const organization = await User.findById(medic.organization);
-    if (!organization || organization._id !== req.user.id) {
+    const organization = await Organization.findById(medic.organization)
+      .populate('administrator')
+      .exec();
+    if (!organization || organization.administrator._id !== req.user.id) {
       return next(new AppError('You cannot perform this operation', 400));
     }
     medic.isConfirmed = true;
