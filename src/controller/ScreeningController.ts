@@ -101,8 +101,6 @@ namespace ScreeningController {
       }
     }
     screening = await createNewScreening(relation);
-    console.log('created!');
-
     res.status(200).json({ screening: screening.localized(req.locale) });
   });
 

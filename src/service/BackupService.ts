@@ -6,8 +6,6 @@ const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
 namespace BackupService {
   export const dumpBackup = (fileName?: string) => {
     const archivePath = backupPath(fileName || Date.now().toString());
-    console.log(archivePath);
-
     const uri = getDbConnectionString();
     return spawn('mongodump', [
       `${uri}`,
