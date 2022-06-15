@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import pug from 'pug';
 import { htmlToText } from 'html-to-text';
 import AppLocale from '../model/enum/AppLocale';
+import { IMedic } from '../model/data/schema/Medic';
 
 class EmailService {
   to: string;
@@ -15,7 +16,7 @@ class EmailService {
     this.from = `Arystoteles <${process.env.EMAIL_FROM}>`;
   }
 
-  public newTransport() {
+  private newTransport() {
     if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
         service: 'SendGrid',
@@ -75,6 +76,13 @@ class EmailService {
     await this.send('failure', 'Failure report', {
       msg,
       file,
+    });
+  }
+
+  public async sendMedicConfirmationRequest(medic: IMedic) {
+    await this.send('medic-confirmation-request', 'Confirm a medic account', {
+      fullName: medic.user.fullName,
+      email: medic.user.email,
     });
   }
 }
