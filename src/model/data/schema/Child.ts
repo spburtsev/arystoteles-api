@@ -54,6 +54,7 @@ const ChildSchema = new Schema({
     type: Number,
     required: false,
   },
+  relations: [{ type: Schema.Types.ObjectId, ref: 'ChildRelation' }],
   gender: {
     type: String,
     enum: Object.values(Gender),
