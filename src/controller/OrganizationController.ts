@@ -26,9 +26,11 @@ namespace OrganizationController {
     const org = await Organization.findOne({
       administrator: usr._id,
     }).exec();
-    const profile: any = org ? org : 'not created yet';
+    const [status, profile] = org
+      ? ['success', org]
+      : ['warning', 'not created yet'];
     res.status(200).json({
-      status: 'success',
+      status,
       profile,
     });
   });

@@ -17,23 +17,23 @@ export interface IOrganization extends Document {
 const OrganizationSchema = new Schema<IOrganization>({
   name: {
     type: String,
-    required: false,
+    required: true,
   },
   description: {
     type: String,
-    required: false,
+    required: true,
   },
   address: {
     type: String,
-    required: false,
+    required: true,
   },
   phone: {
     type: String,
-    required: false,
+    required: true,
   },
   email: {
     type: String,
-    required: false,
+    required: true,
   },
   image: {
     type: String,
