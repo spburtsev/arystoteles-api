@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import pug from 'pug';
 import { htmlToText } from 'html-to-text';
-import AppLocale from '../../model/enum/AppLocale';
+import AppLocale from '../model/enum/AppLocale';
 
 class EmailService {
   to: string;

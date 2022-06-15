@@ -1,38 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import getDbConnectionString from '../lib/helpers/get-db-connection-string';
-import { spawn } from 'child_process';
 import catchAsync from '../lib/helpers/catch-async';
 import BackupMethod from '../model/enum/BackupMethod';
 import path from 'path';
 import fs from 'fs/promises';
 import Backup, { IBackup } from '../model/data/schema/Backup';
-
-const backupPath = (fileName: string) => `backup/${fileName}.gzip`;
-
-const dumpBackup = (fileName: string) => {
-  const archivePath = backupPath(fileName);
-  console.log(archivePath);
-
-  const uri = getDbConnectionString();
-  const proc = spawn('mongodump', [
-    `${uri}`,
-    `--archive=./${archivePath}`,
-    '--gzip',
-  ]);
-
-  return proc;
-};
-
-const restore = (fileName: string) => {
-  const uri = getDbConnectionString();
-  const archivePath = backupPath(fileName);
-  return spawn('mongorestore', [
-    `${uri}`,
-    `--archive=./${archivePath}`,
-    '--gzip',
-    '--drop',
-  ]);
-};
+import BackupService from '../service/BackupService';
 
 const readExistingBackups = async () => {
   const backupPath = path.join(__dirname, '../../backup/');
@@ -71,8 +43,8 @@ namespace BackupController {
     res: Response,
     _next: NextFunction,
   ) => {
-    const fileName = req.body.fileName || Date.now().toString();
-    const dumpProcess = dumpBackup(fileName);
+    const fileName = req.body.fileName;
+    const dumpProcess = BackupService.dumpBackup(fileName);
 
     dumpProcess.on('exit', async (code, signal) => {
       if (code) {
@@ -107,7 +79,7 @@ namespace BackupController {
     const preservedBackups = await Backup.find({
       createdAt: { $gte: backup.createdAt },
     }).exec();
-    const restoreProcess = restore(fileName);
+    const restoreProcess = BackupService.restore(fileName);
     restoreProcess.on('error', error => {
       return res.status(500).json({
         message: error.message,

@@ -22,6 +22,45 @@ import medicRouter from './router/medic-router';
 import journalPostRouter from './router/journal-post-router';
 import deviceRouter from './router/device-router';
 import AppLocale from './model/enum/AppLocale';
+import BackupService from './service/BackupService';
+import EmailService from './service/EmailService';
+import BackupMethod from './model/enum/BackupMethod';
+import Backup from './model/data/schema/Backup';
+import cron from 'node-cron';
+
+const setupScheduledJobs = () => {
+  cron.schedule('59 23 * * *', () => {
+    console.log('---------------------');
+    console.log('Running a mongodump Job');
+    const fileName = Date.now().toString();
+    const proc = BackupService.dumpBackup(fileName);
+
+    proc.on('exit', async (code, signal) => {
+      if (code) {
+        console.log(
+          `Backup process exited with code: ${code} for backup at ${fileName}`,
+        );
+      }
+      if (signal) {
+        console.log(
+          `Backup process killed with signal: ${signal} for backup at ${fileName}`,
+        );
+      }
+      const backup = new Backup({
+        fileName,
+        method: BackupMethod.Mongodump,
+        createdAt: new Date(),
+        createdBy: 'system',
+      });
+      await backup.save();
+
+      console.log(`Backup '${fileName}' created successfully`);
+    });
+    console.log('---------------------');
+  });
+
+  console.log('Scheduled jobs were set up');
+};
 
 namespace App {
   export const create = () => {
@@ -73,6 +112,7 @@ namespace App {
     });
 
     app.use(errorMiddleware);
+    setupScheduledJobs();
     return app;
   };
 }

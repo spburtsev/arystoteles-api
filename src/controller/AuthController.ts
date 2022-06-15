@@ -6,7 +6,20 @@ import User, { IUser } from '../model/data/schema/User';
 import { Request, Response, NextFunction } from 'express';
 import catchAsync from '../lib/helpers/catch-async';
 import UserRole, { securedRoles } from '../model/enum/UserRole';
-import EmailService from '../controller/service/EmailService';
+import EmailService from '../service/EmailService';
+import _ from 'lodash';
+
+const userAttributes = [
+  'firstName',
+  'lastName',
+  'email',
+  'password',
+  'role',
+  'birthDate',
+  'country',
+  'city',
+  'preferredLocale',
+];
 
 const signToken = (id: string, role: UserRole) => {
   return jwtSync.sign({ id, role }, process.env.JWT_SECRET, {
@@ -45,19 +58,13 @@ const createToken = async (
 
 namespace AuthController {
   export const register = catchAsync(async (req, res, next) => {
-    const { email, password, role, firstName, lastName } = req.body;
-    if (securedRoles.includes(role)) {
+    const usr = _.pick(req.body, userAttributes);
+    if (securedRoles.includes(usr.role)) {
       return next(
-        new AppError(`It is not allowed to register as ${role}`, 400),
+        new AppError(`It is not allowed to register as ${usr.role}`, 400),
       );
     }
-    const user = await User.create({
-      email,
-      password,
-      role,
-      firstName,
-      lastName,
-    });
+    const user = await User.create(usr);
     const url = `${req.protocol}://${req.get('host')}/me`;
     await new EmailService(user.email, url).sendWelcome();
     createToken(user, 201, req, res);

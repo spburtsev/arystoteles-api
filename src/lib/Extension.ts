@@ -1,8 +1,8 @@
 import { type Query } from "mongoose";
-import type RequestQuery from "../../types/request-query";
-import { parseExtension } from "../../lib/functional";
+import type RequestQuery from "../types/request-query";
+import { parseExtension } from "./functional";
 
-class ExtensionService<QueryResultT, DocT> {
+class Extension<QueryResultT, DocT> {
   dbQuery: Query<QueryResultT, DocT> | Query<DocT[], DocT, {}, DocT>;
   requestQuery: RequestQuery;
 
@@ -55,4 +55,4 @@ class ExtensionService<QueryResultT, DocT> {
     return this;
   }
 }
-export default ExtensionService;
+export default Extension;
