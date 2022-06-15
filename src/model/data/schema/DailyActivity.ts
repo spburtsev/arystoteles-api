@@ -10,9 +10,7 @@ export interface IDailyActivity extends Document {
   child: IChild;
   caregiver?: IUser;
   isCompleted: boolean;
-
   localized: (locale: AppLocale) => any;
-
   complete: (value: boolean, caregiver: IUser) => void;
 }
 
@@ -32,6 +30,7 @@ DailyActivitySchema.methods.localized = function(locale: AppLocale) {
     id: this._id,
     activity: this.activity.localized(locale),
     isCompleted: this.isCompleted,
+    completedBy: this.isCompleted ? this.caregiver : null,
   };
 };
 

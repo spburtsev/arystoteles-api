@@ -24,7 +24,6 @@ export interface IChild extends Document {
   ageGroup: AgeGroup;
   devices: Array<IDevice>;
   gender: Gender;
-
   isRelatedTo: (caregiverId: string) => boolean;
   getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
 }
