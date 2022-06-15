@@ -7,7 +7,7 @@ import catchAsync from '../lib/helpers/catch-async';
 import Child, { IChild } from '../model/data/schema/Child';
 import Tip from '../model/data/schema/Tip';
 import User, { IUser } from '../model/data/schema/User';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 
 const accessAttributes = [
   'firstName',

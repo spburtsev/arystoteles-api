@@ -1,5 +1,5 @@
 import JournalPost from '../model/data/schema/JournalPost';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import catchAsync from '../lib/helpers/catch-async';
 import User from '../model/data/schema/User';
 

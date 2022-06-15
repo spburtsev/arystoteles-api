@@ -1,5 +1,5 @@
 import Question from '../model/data/schema/Question';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 
 namespace QuestionController {
   export const createQuestion = CrudFactory.createOne(Question);

@@ -1,5 +1,5 @@
 import Screening, { IScreening } from '../model/data/schema/Screening';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import catchAsync from '../lib/helpers/catch-async';
 import AppError from '../model/error/AppError';
 import Child, { IChild } from '../model/data/schema/Child';

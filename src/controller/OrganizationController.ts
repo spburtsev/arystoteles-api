@@ -1,5 +1,5 @@
 import Organization, { IOrganization } from '../model/data/schema/Organization';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import catchAsync from '../lib/helpers/catch-async';
 import User from '../model/data/schema/User';
 import UserRole from '../model/enum/UserRole';

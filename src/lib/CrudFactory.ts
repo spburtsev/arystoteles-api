@@ -1,7 +1,7 @@
-import catchAsync from '../../lib/helpers/catch-async';
-import AppError from '../../model/error/AppError';
+import catchAsync from './helpers/catch-async';
+import AppError from '../model/error/AppError';
 import { Model, Query } from 'mongoose';
-import ExtensionService from '../../lib/Extension';
+import ExtensionService from './Extension';
 
 namespace CrudFactory {
   export const deleteOne = <T>(model: Model<T>) =>

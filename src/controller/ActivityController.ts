@@ -1,5 +1,5 @@
 import Activity from '../model/data/schema/Activity';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 
 namespace ActivityController {
   export const createActivity = CrudFactory.createOne(Activity);

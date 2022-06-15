@@ -1,5 +1,5 @@
 import Tip from '../model/data/schema/Tip';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 
 namespace TipController {
   export const createTip = CrudFactory.createOne(Tip);

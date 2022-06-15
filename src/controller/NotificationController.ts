@@ -1,5 +1,5 @@
 import Notification from '../model/data/schema/Notification';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
 

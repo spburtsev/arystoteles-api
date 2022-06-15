@@ -1,6 +1,6 @@
 import Device from '../model/data/schema/Device';
 import DeviceReport from '../model/data/schema/DeviceReport';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import catchAsync from '../lib/helpers/catch-async';
 
 namespace DeviceController {

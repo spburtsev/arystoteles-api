@@ -7,7 +7,7 @@ import AppLocale from '../model/enum/AppLocale';
 import UserRole from '../model/enum/UserRole';
 import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 import Organization from '../model/data/schema/Organization';
 import EmailService from '../service/EmailService';
 import { Request } from 'express';

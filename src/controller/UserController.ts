@@ -5,7 +5,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import AppError from '../model/error/AppError';
 import catchAsync from '../lib/helpers/catch-async';
-import CrudFactory from './factory/CrudFactory';
+import CrudFactory from '../lib/CrudFactory';
 
 const storage = multer.memoryStorage();
 
