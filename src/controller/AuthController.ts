@@ -58,8 +58,8 @@ namespace AuthController {
       firstName,
       lastName,
     });
-    // const url = `${req.protocol}://${req.get('host')}/me`;
-    // await new EmailService(user.email, url).sendWelcome();
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    await new EmailService(user.email, url).sendWelcome();
     createToken(user, 201, req, res);
   });
 
