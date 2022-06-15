@@ -26,7 +26,7 @@ import BackupService from './service/BackupService';
 import EmailService from './service/EmailService';
 import BackupMethod from './model/enum/BackupMethod';
 import Backup from './model/data/schema/Backup';
-import cron, { CronJob } from 'cron';
+import { CronJob } from 'cron';
 
 const setupScheduledJobs = () => {
   const backupJob = new CronJob('59 23 * * *', () => {
