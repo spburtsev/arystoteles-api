@@ -106,7 +106,6 @@ namespace MedicController {
       filteredBody.confirmed = false;
       filteredBody.organization = filteredBody.organizationId;
     }
-    console.log(filteredBody);
 
     const updatedMedic = await Medic.findByIdAndUpdate(
       medic._id,
@@ -142,7 +141,10 @@ namespace MedicController {
     const organization = await Organization.findById(medic.organization)
       .populate('administrator')
       .exec();
-    if (!organization || organization.administrator._id !== req.user.id) {
+    if (
+      !organization ||
+      organization.administrator._id.toString() !== req.user.id
+    ) {
       return next(new AppError('You cannot perform this operation', 400));
     }
     medic.isConfirmed = true;
