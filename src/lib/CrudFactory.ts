@@ -1,6 +1,6 @@
 import catchAsync from './helpers/catch-async';
 import AppError from '../model/error/AppError';
-import { Model, Query } from 'mongoose';
+import { Model } from 'mongoose';
 import ExtensionService from './Extension';
 
 namespace CrudFactory {
@@ -31,9 +31,7 @@ namespace CrudFactory {
 
       res.status(200).json({
         status: 'success',
-        data: {
-          data: doc,
-        },
+        data: doc,
       });
     });
 
@@ -43,9 +41,7 @@ namespace CrudFactory {
 
       res.status(201).json({
         status: 'success',
-        data: {
-          data: doc,
-        },
+        data: doc,
       });
     });
 
@@ -63,9 +59,7 @@ namespace CrudFactory {
 
       res.status(200).json({
         status: 'success',
-        data: {
-          data: doc,
-        },
+        data: doc,
       });
     });
 
@@ -86,9 +80,7 @@ namespace CrudFactory {
       res.status(200).json({
         status: 'success',
         results: doc.length,
-        data: {
-          data: doc,
-        },
+        data: doc,
       });
     });
 }
