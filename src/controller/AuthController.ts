@@ -37,12 +37,19 @@ const createToken = async (
   const expires = new Date(
     Date.now() + parseInt(process.env.JWT_EXPIRES_IN) * 24 * 60 * 60 * 1000,
   );
-
-  res.cookie('jwt', token, {
+  const cookieOptions: {
+    expires: Date;
+    httpOnly: boolean;
+    secure?: boolean;
+  } = {
     expires,
     httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-  });
+  };
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+
+  res.cookie('jwt', token, cookieOptions);
 
   const secured = user.secured();
 
