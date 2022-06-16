@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import hpp from 'hpp';
 import cors from 'cors';
 import AppError from './model/error/AppError';
 import errorMiddleware from './middleware/error-middleware';
@@ -88,6 +89,11 @@ namespace App {
     app.use(express.json({ limit: '10kb' }));
     app.use(mongoSanitize());
     app.use(xss());
+    app.use(
+      hpp({
+        whitelist: [],
+      }),
+    );
     app.use(
       cors({
         origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
