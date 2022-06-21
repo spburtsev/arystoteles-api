@@ -23,6 +23,8 @@ const notifyOrganization = async (
   if (!organization) {
     throw new AppError('Organization not found', 404);
   }
+  organization.medics.push(medic._id);
+  await organization.save();
   const notification = new Notification({
     type: NotificationType.Info,
     user: organization.administrator,

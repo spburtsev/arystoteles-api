@@ -47,9 +47,11 @@ namespace OrganizationController {
     })
       .populate({ path: 'medics', populate: { path: 'user' } })
       .exec();
+
     if (!org) {
       return next(new AppError('Organization not found', 404));
     }
+
     res.status(200).json({
       status: 'success',
       total: org.medics.length,
