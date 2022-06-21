@@ -35,6 +35,28 @@ namespace OrganizationController {
     });
   });
 
+  export const getSelfMedics = catchAsync(async (req, res, next) => {
+    const usr = await User.findById(req.user.id)
+      .where('role', UserRole.OrganizationAdministrator)
+      .exec();
+    if (!usr) {
+      return next(new AppError('User not found', 404));
+    }
+    const org = await Organization.findOne({
+      administrator: usr._id,
+    })
+      .populate({ path: 'medics', populate: { path: 'user' } })
+      .exec();
+    if (!org) {
+      return next(new AppError('Organization not found', 404));
+    }
+    res.status(200).json({
+      status: 'success',
+      total: org.medics.length,
+      medics: org.medics,
+    });
+  });
+
   export const createSelf = catchAsync(async (req, res, next) => {
     const usr = await User.findById(req.user.id)
       .where('role', UserRole.OrganizationAdministrator)

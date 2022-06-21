@@ -11,6 +11,7 @@ router
   .get(OrganizationController.getSelf)
   .patch(OrganizationController.updateSelf)
   .post(OrganizationController.createSelf);
+router.route('/me/medics').get(OrganizationController.getSelfMedics);
 
 router.get('/', OrganizationController.getAllOrganizations);
 
