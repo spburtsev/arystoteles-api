@@ -23,6 +23,8 @@ const notifyOrganization = async (
   if (!organization) {
     throw new AppError('Organization not found', 404);
   }
+  medic.isConfirmed = false;
+  await medic.save();
   organization.medics.push(medic._id);
   await organization.save();
   const notification = new Notification({
