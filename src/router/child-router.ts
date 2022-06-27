@@ -8,6 +8,7 @@ router.use(AuthController.protect);
 
 router.route('/tips/:id').get(ChildController.getTips);
 router.route('/related').get(ChildController.getRelatedChildren);
+router.route('/assigned').get(ChildController.getAllChildren);
 
 router
   .route('/')

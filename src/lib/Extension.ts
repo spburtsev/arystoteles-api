@@ -17,7 +17,7 @@ class Extension<QueryResultT, DocT> {
     excludedFields.forEach(el => delete queryObj[el]);
 
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt|regex)\b/g, match => `$${match}`);
 
     this.dbQuery = this.dbQuery.find(JSON.parse(queryStr));
     return this;

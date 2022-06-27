@@ -5,14 +5,19 @@ import path from 'path';
 import fs from 'fs/promises';
 import Backup, { IBackup } from '../model/data/schema/Backup';
 import BackupService from '../service/BackupService';
+import Extension from '../lib/Extension';
 
-const readExistingBackups = async () => {
+const readExistingBackups = async query => {
   const backupPath = path.join(__dirname, '../../backup/');
   const backupFiles = await fs.readdir(backupPath, 'utf-8');
-  const backups = await Backup.find({})
-    .sort({ createdAt: 'desc' })
-    .populate('createdBy')
-    .exec();
+
+  const ext = new Extension(Backup.find({}), query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  const backups = await ext.dbQuery;
 
   let validBackups: Array<IBackup> = [];
   let invalidBackups: Array<IBackup> = [];
@@ -34,7 +39,7 @@ const readExistingBackups = async () => {
 
 namespace BackupController {
   export const getAllBackups = catchAsync(async (req, res, next) => {
-    const backups = await readExistingBackups();
+    const backups = await readExistingBackups(req.query);
     res.status(200).json({ total: backups.length, backups });
   });
 

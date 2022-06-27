@@ -66,10 +66,6 @@ namespace CrudFactory {
   export const getAll = <T>(model: Model<T>) =>
     catchAsync(async (req, res, _next) => {
       let filter = {};
-      if (req.params.id) {
-        filter = { item: req.params.id };
-      }
-
       const ext = new ExtensionService(model.find(filter), req.query)
         .filter()
         .sort()
