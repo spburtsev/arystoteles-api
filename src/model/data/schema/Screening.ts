@@ -1,4 +1,4 @@
-import { Model, Schema, Document, model } from 'mongoose';
+import { Model, Schema, Document, Query, model } from 'mongoose';
 import _Option from './types/_Option';
 import _Expectation from './types/_Expectation';
 import { IQuestion } from './Question';
@@ -35,7 +35,7 @@ ScreeningSchema.methods.estimateResult = async function(this: IScreening) {
   const ageGroup = this.relation.child.ageGroup;
   this.questions.forEach((question: IQuestion, index) => {
     const relevantExpectation = question.expectations.find(
-      x => x.ageGroup === ageGroup,
+      (x) => x.ageGroup === ageGroup,
     ).value;
     const relevantOption = question.options[this.answers[index]].value;
     if (relevantOption === relevantExpectation) {
@@ -49,11 +49,20 @@ ScreeningSchema.methods.estimateResult = async function(this: IScreening) {
       : ScreeningResult.NeedsReview;
 };
 
+ScreeningSchema.pre<Query<Array<IScreening>, IScreening>>(/^find/, function(
+  next,
+) {
+  if (!this.getPopulatedPaths().includes('questions')) {
+    this.populate('questions');
+  }
+  next();
+});
+
 ScreeningSchema.methods.localized = function(locale: AppLocale) {
   return {
     _id: this._id,
     totalQuestions: this.questions.length,
-    questions: this.questions.map(question => question.localized(locale)),
+    questions: this.questions.map((question) => question.localized(locale)),
     answers: this.answers,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,

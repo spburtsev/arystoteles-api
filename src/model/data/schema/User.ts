@@ -1,11 +1,10 @@
-import { Model, Schema, Document, Query, model } from 'mongoose';
-import UserRole from '../../enum/UserRole';
-import validator from 'validator';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import Medic from './Medic';
+import { Document, Model, model, Query, Schema } from 'mongoose';
+import validator from 'validator';
 import AppLocale from '../../enum/AppLocale';
-import ChildRelation, { IChildRelation } from './ChildRelation';
+import UserRole from '../../enum/UserRole';
+import { IChildRelation } from './ChildRelation';
 
 export interface IUser extends Document {
   email: string;
@@ -22,6 +21,7 @@ export interface IUser extends Document {
   passwordResetToken: string;
   passwordResetExpires: Date;
   fullName: string;
+
   comparePasswords: (
     candidatePassword: string,
     userPassword: string,
@@ -49,22 +49,10 @@ const UserSchema = new Schema<IUser>({
     minlength: 6,
     select: false,
   },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  country: {
-    type: String,
-    required: true,
-  },
-  city: {
-    type: String,
-    required: false,
-  },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  country: { type: String, required: true },
+  city: { type: String, required: false },
   preferredLocale: {
     type: String,
     required: false,

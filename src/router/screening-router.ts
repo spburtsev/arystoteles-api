@@ -10,7 +10,6 @@ router.post('/monthly/:childId', ScreeningController.getMonthlyScreening);
 router.get('/history/:childId', ScreeningController.getScreeningHistory);
 router.patch('/modify/:id', ScreeningController.modifyScreening);
 
-router.use(AuthController.restrictTo(UserRole.Admin, UserRole.Seed));
 router.get('/', ScreeningController.getAllScreenings);
 router.post('/', ScreeningController.createScreening);
 router
