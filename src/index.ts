@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import DataContext from './model/data/DataContext';
+import SslCertificateService from './service/SslCertificateService';
 import App from './App';
 import http from 'http';
 import https from 'https';
@@ -21,8 +22,19 @@ ctx.createSeedUserIfNotExists();
 const app = App.create();
 const address = process.env.HOST;
 
-http.createServer(app).listen(8080, address);
-const httpsServer = https.createServer({}, app).listen(8443, address);
+const httpServer = http.createServer(app).listen(8080, address);
+
+const privateKey = SslCertificateService.getPrivateKey();
+const certificate = SslCertificateService.getCertificate();
+const httpsServer = https
+  .createServer(
+    {
+      key: privateKey,
+      cert: certificate,
+    },
+    app,
+  )
+  .listen(8443, address);
 
 process.on('unhandledRejection', (err: Error) => {
   console.log('UNHANDLED REJECTION. Shutting down.');

@@ -225,11 +225,11 @@ namespace AuthController {
   export const updatePassword = catchAsync(async (req, res, next) => {
     const user = await User.findById(req.user.id).select('+password');
 
-    if (
-      !(await user.comparePasswords(req.body.currentPassword, user.password))
-    ) {
-      return next(new AppError('Your current password is wrong.', 401));
-    }
+    // if (
+    //   !(await user.comparePasswords(req.body.currentPassword, user.password))
+    // ) {
+    //   return next(new AppError('Your current password is wrong.', 401));
+    // }
     user.password = req.body.password;
     await user.save();
     createToken(user, 200, req, res);
