@@ -1,5 +1,6 @@
 import fs from 'fs';
 import forge from 'node-forge';
+import path from 'path';
 
 const certAttributes = [
   {
@@ -50,15 +51,22 @@ namespace SslCertificateService {
       `${__dirname}/../../cert/key.pem`,
       pki.privateKeyToPem(keys.privateKey),
     );
-    fs.writeFileSync(`${__dirname}/../../cert/cert.pem`, pemCertificate);
+    fs.writeFileSync(
+      path.resolve(`${__dirname}/../../cert/cert.pem`),
+      pemCertificate,
+    );
   }
 
   export function getPrivateKey() {
-    return fs.readFileSync(`${__dirname}/../../cert/key.pem`).toString();
+    return fs
+      .readFileSync(path.resolve(`${__dirname}/../../cert/key.pem`))
+      .toString();
   }
 
   export function getCertificate() {
-    return fs.readFileSync(`${__dirname}/../../cert/cert.pem`).toString();
+    return fs
+      .readFileSync(path.resolve(`${__dirname}/../../cert/cert.pem`))
+      .toString();
   }
 }
 export default SslCertificateService;
