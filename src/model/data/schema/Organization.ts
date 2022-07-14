@@ -1,4 +1,4 @@
-import { Model, Schema, Document, model } from 'mongoose';
+import { Model, Schema, Document, model, Query } from 'mongoose';
 import { IUser } from './User';
 import { IMedic } from './Medic';
 import UserRole from '../../enum/UserRole';
@@ -45,6 +45,13 @@ const OrganizationSchema = new Schema<IOrganization>({
     required: true,
   },
   medics: [{ type: Schema.Types.ObjectId, ref: 'Medic' }],
+});
+
+OrganizationSchema.pre<Query<Array<IMedic>, IMedic>>(/^find/, function(next) {
+  if (!this.getPopulatedPaths().includes('medics')) {
+    this.populate({ path: 'medics', populate: { path: 'user' } });
+  }
+  next();
 });
 
 const Organization: Model<IOrganization> = model(

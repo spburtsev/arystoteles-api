@@ -8,6 +8,7 @@ import Child, { IChild } from '../model/data/schema/Child';
 import Tip from '../model/data/schema/Tip';
 import User, { IUser } from '../model/data/schema/User';
 import CrudFactory from '../lib/CrudFactory';
+import Medic from '../model/data/schema/Medic';
 
 const accessAttributes = [
   'firstName',
@@ -112,6 +113,30 @@ namespace ChildController {
       status: 'success',
       total: children.length,
       children,
+    });
+  });
+
+  export const getAssignedChildren = catchAsync(async (req, res, next) => {
+    const usr = await User.findById(req.user.id).exec();
+    if (!usr) {
+      return next(new AppError('User not found', 404));
+    }
+    if (usr.role !== UserRole.Medic) {
+      return next(new AppError('You are not a medic', 403));
+    }
+    const medic = await Medic.findOne({ user: usr._id })
+      .populate({
+        path: 'children',
+      })
+      .exec();
+    if (!medic) {
+      return next(new AppError('Medic not found', 404));
+    }
+
+    res.status(200).json({
+      status: 'success',
+      total: medic.children.length,
+      children: medic.children,
     });
   });
 
