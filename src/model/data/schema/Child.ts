@@ -25,6 +25,7 @@ export interface IChild extends Document {
   devices: Array<IDevice>;
   gender: Gender;
   isRelatedTo: (caregiverId: string) => boolean;
+  isAssignedTo: (medicId: string) => boolean;
   getScreeningQuestions: () => Promise<Array<IQuestion & { _id: any }>>;
 }
 
@@ -59,10 +60,9 @@ const ChildSchema = new Schema({
     enum: Object.values(Gender),
     required: true,
   },
-  medic: { type: Schema.Types.ObjectId, ref: 'Medic' },
+  medic: { type: Schema.Types.ObjectId, ref: 'Medic', required: false },
   journalPosts: [{ type: Schema.Types.ObjectId, ref: 'JournalPost' }],
   dailyActivities: [{ type: Schema.Types.ObjectId, ref: 'DailyActivity' }],
-  screenings: [{ type: Schema.Types.ObjectId, ref: 'Screening' }],
   devices: [{ type: Schema.Types.ObjectId, ref: 'Device' }],
 });
 
@@ -112,6 +112,10 @@ ChildSchema.methods.isRelatedTo = function(caregiverId: string) {
     (relation: IChildRelation) =>
       relation.caregiver._id.toString() === caregiverId,
   );
+};
+
+ChildSchema.methods.isAssignedTo = function(medicId: string) {
+  return this.medic && this.medic.toString() === medicId;
 };
 
 const Child: Model<IChild> = model('Child', ChildSchema);

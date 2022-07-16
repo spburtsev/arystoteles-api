@@ -3,6 +3,8 @@ import pug from 'pug';
 import { htmlToText } from 'html-to-text';
 import AppLocale from '../model/enum/AppLocale';
 import { IMedic } from '../model/data/schema/Medic';
+import { IScreening } from 'src/model/data/schema/Screening';
+import { IChild } from 'src/model/data/schema/Child';
 
 class EmailService {
   to: string;
@@ -83,6 +85,14 @@ class EmailService {
     await this.send('medic-confirmation-request', 'Confirm a medic account', {
       fullName: medic.user.fullName,
       email: medic.user.email,
+    });
+  }
+
+  public async sendScreeningResult(screening: IScreening, child: IChild) {
+    await this.send('screening-result', 'Screening result', {
+      dateTime: screening.updatedAt || screening.createdAt,
+      childName: child.firstName,
+      childBirthDate: child.birthDate,
     });
   }
 }

@@ -5,9 +5,11 @@ import AppError from '../model/error/AppError';
 import Child, { IChild } from '../model/data/schema/Child';
 import monthDifference from '../lib/helpers/month-difference';
 import User, { IUser } from '../model/data/schema/User';
+import Medic, { IMedic } from '../model/data/schema/Medic';
 import ChildRelation, {
   IChildRelation,
 } from '../model/data/schema/ChildRelation';
+import EmailService from '../service/EmailService';
 
 const createNewScreening = async (rel: IChildRelation) => {
   const questions = await rel.child.getScreeningQuestions();
@@ -146,6 +148,20 @@ namespace ScreeningController {
     screening.answers = answers;
     screening.updatedAt = new Date();
     screening.estimateResult();
+    if (screening.needsReview()) {
+      if (screening.relation.child.medic) {
+        const medic = await Medic.findById(screening.relation.child.medic)
+          .populate('user')
+          .exec();
+        if (medic) {
+          await new EmailService(medic.user.email, '').sendScreeningResult(
+            screening,
+            screening.relation.child,
+          );
+        }
+      }
+    }
+
     const savedScreening = await screening.save();
     res.status(200).json({ screening: savedScreening });
   });

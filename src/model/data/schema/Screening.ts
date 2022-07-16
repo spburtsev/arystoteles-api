@@ -15,6 +15,7 @@ export interface IScreening extends Document {
   result?: ScreeningResult;
   localized: (locale: AppLocale) => any;
   estimateResult: () => void;
+  needsReview: () => boolean;
 }
 
 const ScreeningSchema = new Schema({
@@ -35,7 +36,7 @@ ScreeningSchema.methods.estimateResult = async function(this: IScreening) {
   const ageGroup = this.relation.child.ageGroup;
   this.questions.forEach((question: IQuestion, index) => {
     const relevantExpectation = question.expectations.find(
-      (x) => x.ageGroup === ageGroup,
+      x => x.ageGroup === ageGroup,
     ).value;
     const relevantOption = question.options[this.answers[index]].value;
     if (relevantOption === relevantExpectation) {
@@ -62,12 +63,16 @@ ScreeningSchema.methods.localized = function(locale: AppLocale) {
   return {
     _id: this._id,
     totalQuestions: this.questions.length,
-    questions: this.questions.map((question) => question.localized(locale)),
+    questions: this.questions.map(question => question.localized(locale)),
     answers: this.answers,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
     result: this.result,
   };
+};
+
+ScreeningSchema.methods.needsReview = function() {
+  return this.result === ScreeningResult.NeedsReview;
 };
 
 const Screening: Model<IScreening> = model('Screening', ScreeningSchema);
